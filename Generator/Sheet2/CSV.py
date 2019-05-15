@@ -11,7 +11,7 @@ from __future__ import absolute_import
 import os
 import pandas as pd
 import numpy as np
-from . import csv
+import csv
 
 def Create(Dir_Basin, Simulation, Basin, Startdate, Enddate, nc_outname, Example_dataset):
     """
