@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/watools
 Module: Collect/GPM
 """
+from __future__ import print_function
 
 import numpy as np
 import os

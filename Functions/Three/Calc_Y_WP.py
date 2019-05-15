@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Function/Three
 """
+from __future__ import print_function
 import csv
 import numpy as np
 import calendar

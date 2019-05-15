@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Collect/MOD9
 """
+from __future__ import print_function
 
 # import general python modules
 import os

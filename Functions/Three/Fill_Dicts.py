@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Function/Four
 """
+from __future__ import print_function
 
 
 def Crop_Dictionaries(wp_y_irrigated_dictionary, wp_y_rainfed_dictionary, dict_crops, nc_outname, output_dir):

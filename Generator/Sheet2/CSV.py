@@ -6,11 +6,12 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Generator/Sheet2
 """
+from __future__ import absolute_import
 # import general modules
 import os
 import pandas as pd
 import numpy as np
-import csv
+from . import csv
 
 def Create(Dir_Basin, Simulation, Basin, Startdate, Enddate, nc_outname, Example_dataset):
     """

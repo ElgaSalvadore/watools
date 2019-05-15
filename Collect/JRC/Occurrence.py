@@ -5,6 +5,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/watools
 Module: Collect/JRC
 """
+from __future__ import print_function
 
 import sys
 from watools.Collect.JRC.DataAccess import DownloadData

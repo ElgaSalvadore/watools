@@ -8,6 +8,7 @@ Module: waterpix
 """
 
 from __future__ import division
+from __future__ import print_function
 import os
 import tempfile
 import arcpy
@@ -26,7 +27,7 @@ def create_input_nc(start_date, years,
     Creates the input netcdf file required to run waterpix
     """
     # Script parameters
-    print "Variable\tRaster"
+    print("Variable\tRaster")
     arcpy.CheckOutExtension('spatial')
     if bbox:
         latlim = [bbox[1], bbox[3]]
@@ -231,7 +232,7 @@ def create_input_nc(start_date, years,
     temp_dir = tempfile.mkdtemp()
 
     # Theta sat
-    print "{0}\t{1}".format('thetasat', thetasat_ras)
+    print("{0}\t{1}".format('thetasat', thetasat_ras))
     thetasat_temp = os.path.join(temp_dir, 'thetasat.tif')
     arcpy.management.Resample(thetasat_ras, thetasat_temp,
                               cellsize)
@@ -241,7 +242,7 @@ def create_input_nc(start_date, years,
     thetasat_var[:, :] = array[:, :]
 
     # Root depth
-    print "{0}\t{1}".format('rootdepth', rootdepth_ras)
+    print("{0}\t{1}".format('rootdepth', rootdepth_ras))
     rootdepth_temp = os.path.join(temp_dir, 'rootdepth.tif')
     arcpy.management.Resample(rootdepth_ras, rootdepth_temp,
                               cellsize)
@@ -265,7 +266,7 @@ def create_input_nc(start_date, years,
             yyyy = yyyymm[:4]
             mm = yyyymm[-2:]
             ras = all_paths[var].format(yyyy=yyyy, mm=mm)
-            print "{0}\t{1}".format(var, ras)
+            print("{0}\t{1}".format(var, ras))
             arcpy.management.Resample(ras, os.path.join(temp_dir2,
                                                         os.path.basename(ras)),
                                       cellsize, 'NEAREST')
@@ -279,7 +280,7 @@ def create_input_nc(start_date, years,
     temp_dir2 = tempfile.mkdtemp()
     for yyyy in years_ls:
         ras = all_paths['qratio'].format(yyyy=yyyy)
-        print "{0}\t{1}".format('qratio', ras)
+        print("{0}\t{1}".format('qratio', ras))
         arcpy.management.Resample(ras, os.path.join(temp_dir2,
                                                     os.path.basename(ras)),
                                   cellsize, 'NEAREST')

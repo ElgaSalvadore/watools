@@ -5,6 +5,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/watools
 Module: Collect/CFSR
 """
+from __future__ import print_function
 # General modules
 import os
 import pycurl

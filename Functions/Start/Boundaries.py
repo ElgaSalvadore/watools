@@ -4,6 +4,7 @@ Created on Thu Jan 19 09:22:07 2017
 
 @author: tih
 """
+from __future__ import print_function
 
 import numpy as np
 import shapefile

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # General modules
+from __future__ import print_function
 import numpy as np
 import calendar
 import os

@@ -4,6 +4,7 @@ Created on Mon Mar 12 15:26:15 2018
 
 @author: tih
 """
+from __future__ import print_function
 
 import numpy as np
 import time
@@ -66,7 +67,7 @@ def Run(Runoff_in_m3_month, flow_directions, Basin):
 
         data_flow_tot += data_flow_round
 
-    print('time', time.time() - time1)
+    print(('time', time.time() - time1))
 
     # Seperate the array in a river array and the routed input
     Accumulated_Pixels = data_flow_tot[0,:,:] * Basin

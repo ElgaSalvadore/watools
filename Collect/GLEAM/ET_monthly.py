@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/watools
 Module: Collect/GLEAM
 '''
+from __future__ import print_function
 
 import sys
 from watools.Collect.GLEAM.DataAccess import DownloadData

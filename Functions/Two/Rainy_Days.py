@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Function/Two
 """
+from __future__ import print_function
 # Import general modules
 import calendar
 import glob

@@ -23,6 +23,7 @@ SSEBop.monthly(Dir='C:/Temp/', Startdate='2003-02-24', Enddate='2003-03-09',
                      latlim=[50,54], lonlim=[3,7])
 
 """
+from __future__ import print_function
 # General modules
 import numpy as np
 import os

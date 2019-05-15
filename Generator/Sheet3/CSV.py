@@ -4,8 +4,9 @@ Created on Thu Feb 01 13:15:06 2018
 
 @author: tih
 """
+from __future__ import absolute_import
 import os
-import csv
+from . import csv
 import datetime
 
 def Create(wp_y_irrigated_dictionary, wp_y_rainfed_dictionary, wp_y_non_crop_dictionary, Basin, Simulation, year, Dir_Basin):

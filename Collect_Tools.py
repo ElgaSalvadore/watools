@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: watools
 """
+from __future__ import print_function
 # general modules
 import urllib
 import os

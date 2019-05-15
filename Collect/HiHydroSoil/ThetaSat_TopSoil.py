@@ -4,6 +4,7 @@ Created on Mon Aug 28 07:54:17 2017
 
 @author: tih
 """
+from __future__ import print_function
 
 import sys
 from watools.Collect.HiHydroSoil.DataAccess import DownloadData

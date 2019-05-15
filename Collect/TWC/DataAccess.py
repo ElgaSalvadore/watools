@@ -26,6 +26,7 @@ from watools.Collect import TWC
 TWC.Gray_Water_Footprint(Dir='C:/Temp/', latlim=[50,54], lonlim=[3,7])
 
 """
+from __future__ import print_function
 # General modules
 import numpy as np
 import os

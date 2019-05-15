@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Function/Start
 """
+from __future__ import print_function
 # General Python modules
 import numpy as np
 import os

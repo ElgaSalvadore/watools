@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/watools
 Module: Collect/SoilGrids
 """
+from __future__ import print_function
 import os
 from watools.Collect.SoilGrids.DataAccess import DownloadData
 import sys

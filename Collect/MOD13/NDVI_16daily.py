@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 from watools.Collect.MOD13.DataAccess import DownloadData
 

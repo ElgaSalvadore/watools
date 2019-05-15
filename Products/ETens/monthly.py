@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Products/ETens
 """
+from __future__ import print_function
 # General Modules
 import sys
 import pandas as pd

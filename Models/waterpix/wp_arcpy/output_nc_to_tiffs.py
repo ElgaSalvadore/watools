@@ -6,6 +6,7 @@ Contact: g.espinoza@un-ihe.org
 Repository: https://github.com/gespinoza/waterpix
 Module: waterpix
 """
+from __future__ import print_function
 
 import os
 import arcpy
@@ -58,7 +59,7 @@ def output_nc_to_tiffs(output_nc, output_path):
         # Yearly rasters
         if '_Y' in variable:
             for time in time_y:
-                print '{0}\t{1}'.format(variable, time)
+                print('{0}\t{1}'.format(variable, time))
                 file_name = variable[:-1] + '{0}.tif'.format(time)
                 output_tiff = os.path.join(path_y, variable, file_name)
                 arcpy.md.MakeNetCDFRasterLayer(output_nc, variable,
@@ -71,7 +72,7 @@ def output_nc_to_tiffs(output_nc, output_path):
         # Monthly rasters
         elif '_M' in variable:
             for time in time_m:
-                print '{0}\t{1}'.format(variable, time)
+                print('{0}\t{1}'.format(variable, time))
                 file_name = variable[:-1] + '{0}.tif'.format(time)
                 output_tiff = os.path.join(path_m, variable, file_name)
                 arcpy.md.MakeNetCDFRasterLayer(output_nc, variable,
@@ -83,7 +84,7 @@ def output_nc_to_tiffs(output_nc, output_path):
                 output_ras.save(output_tiff)
         # Additional rasters
         else:
-            print '{0}'.format(variable)
+            print('{0}'.format(variable))
             file_name = variable[:-1] + '.tif'
             output_tiff = os.path.join(path_y, variable, file_name)
             arcpy.md.MakeNetCDFRasterLayer(output_nc, variable,
