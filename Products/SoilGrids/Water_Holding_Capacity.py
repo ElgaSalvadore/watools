@@ -10,13 +10,7 @@ from __future__ import print_function
 
 # import general python modules
 import os
-import gdal
 import numpy as np
-import pandas as pd
-import subprocess
-import osr
-import netCDF4
-import glob
 
 # import WA+ modules
 from watools.General import data_conversions as DC

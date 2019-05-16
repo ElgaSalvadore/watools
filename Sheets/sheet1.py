@@ -8,10 +8,10 @@ Module: Sheets/sheet1
 """
 
 import os
-import time
 import pandas as pd
 import xml.etree.ElementTree as ET
-import subprocess
+import cairosvg
+
 
 def create_sheet1(basin, period, units, data, output, template=False):
     """
@@ -323,32 +323,11 @@ def create_sheet1(basin, period, units, data, output, template=False):
     xml_txt_box = tree.findall('''.//*[@id='et_out']''')[0]
     xml_txt_box.getchildren()[0].text = '%.1f' % depleted_water
 
-    # svg to string
-    ET.register_namespace("", "http://www.w3.org/2000/svg")
-#    root = tree.getroot()
-#    svg_string = ET.tostring(root, encoding='UTF-8', method='xml')
-
-    # Export svg to png
-#    from wand.image import Image
-#    img_out = Image(blob=svg_string, resolution=300)
-#    img_out.format = 'jpg'
-#    img_out.save(filename=output)
-
-    # Get the paths based on the environment variable
-    if os.name == 'posix':
-        Path_Inkscape = 'inkscape'
-
-    else:
-        WA_env_paths = os.environ["WA_PATHS"].split(';')
-        Inkscape_env_path = WA_env_paths[1]
-        Path_Inkscape = os.path.join(Inkscape_env_path,'inkscape.exe')
-
     # Export svg to png
     tempout_path = output.replace('.pdf', '_temporary.svg')
     tree.write(tempout_path)
-    subprocess.call([Path_Inkscape,tempout_path,'--export-pdf='+output, '-d 300'])
-    time.sleep(10)
+    
+    cairosvg.svg2pdf(url=tempout_path, write_to=output)
     os.remove(tempout_path)
-
     # Return
     return output
