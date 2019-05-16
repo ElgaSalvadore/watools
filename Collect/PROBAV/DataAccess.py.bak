@@ -18,6 +18,7 @@ PROBAV.5_daily(Dir='C:/Temp/', Startdate='2014-03-11', Enddate='2015-03-11',
                      latlim=[50,54], lonlim=[3,7])
 
 """
+from __future__ import print_function
 # General modules
 import numpy as np
 import os

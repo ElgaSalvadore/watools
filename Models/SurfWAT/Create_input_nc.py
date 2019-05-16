@@ -5,6 +5,8 @@ Created on Thu Mar 08 08:29:00 2018
 @author: tih
 """
 
+from builtins import str
+from builtins import range
 import netCDF4
 import os
 import pandas as pd

@@ -7,7 +7,11 @@ Repository: https://github.com/wateraccounting/wa
 Module: Generator/Sheet4
 """
 from __future__ import absolute_import
+from __future__ import division
 # import general modules
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import os
 import pandas as pd
 import numpy as np
@@ -67,7 +71,7 @@ def Create(Dir_Basin, Simulation, Basin, Startdate, Enddate, nc_outname):
     YearsStart = pd.date_range(Startdate, Enddate, freq = "AS")
     YearsEnd = pd.date_range(Startdate, Enddate, freq = "A")
     if len(YearsStart) > 0 and len(YearsEnd) > 0:
-        Years = range(int(YearsStart[0].year), int(YearsEnd[-1].year + 1))
+        Years = list(range(int(YearsStart[0].year), int(YearsEnd[-1].year + 1)))
         Start_Year = np.argwhere(str(YearsStart[0])[0:10]==Dates)[0][0]
     else:
         Years = []
@@ -81,14 +85,14 @@ def Create(Dir_Basin, Simulation, Basin, Startdate, Enddate, nc_outname):
     Required_LU_Classes = np.append(LU_Classes_Keys,['Industry','Power and Energy'])
 
     # Convert data from mm/month to km3/month
-    Total_Supply_GW_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_Total_Supply_GW)/ 1e12
-    Total_Supply_SW_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_Total_Supply_SW)/ 1e12
-    Non_Consumed_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_Non_Consumed)/ 1e12
-    Consumed_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_Consumed_ET)/ 1e12
-    RecovableFlow_Return_GW_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_RecovableFlow_Return_GW)/ 1e12
-    RecovableFlow_Return_SW_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_RecovableFlow_Return_SW)/ 1e12
-    NonRecovableFlow_Return_GW_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_NonRecovableFlow_Return_GW)/ 1e12
-    NonRecovableFlow_Return_SW_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_NonRecovableFlow_Return_SW)/ 1e12
+    Total_Supply_GW_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_Total_Supply_GW), 1e12)
+    Total_Supply_SW_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_Total_Supply_SW), 1e12)
+    Non_Consumed_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_Non_Consumed), 1e12)
+    Consumed_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_Consumed_ET), 1e12)
+    RecovableFlow_Return_GW_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_RecovableFlow_Return_GW), 1e12)
+    RecovableFlow_Return_SW_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_RecovableFlow_Return_SW), 1e12)
+    NonRecovableFlow_Return_GW_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_NonRecovableFlow_Return_GW), 1e12)
+    NonRecovableFlow_Return_SW_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_NonRecovableFlow_Return_SW), 1e12)
 
     # Create mask for all LU classes
     All_mask = dict()

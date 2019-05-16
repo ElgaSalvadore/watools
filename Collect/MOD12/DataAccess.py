@@ -9,11 +9,15 @@ Module: Collect/MOD12
 from __future__ import print_function
 
 # import general python modules
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 import os
 import numpy as np
 import pandas as pd
 import gdal
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from bs4 import BeautifulSoup
 import re
 import glob
@@ -23,8 +27,8 @@ import sys
 if sys.version_info[0] == 3:
     import urllib.parse
 if sys.version_info[0] == 2:
-    import urlparse
-    import urllib2
+    import urllib.parse
+    import urllib.request, urllib.error, urllib.parse
 
 # Water Accounting modules
 import watools
@@ -130,8 +134,8 @@ def RetrieveData(Date, args):
     name_collect = os.path.join(output_folder, 'Merged.tif')
 
     # Reproject the MODIS product to epsg_to
-    epsg_to ='4326'
-    name_reprojected = RC.reproject_modis_wgs84(name_collect, epsg_to)
+    #epsg_to ='4326'
+    name_reprojected = RC.reproject_modis_wgs84(name_collect, method=2)
 
     # Clip the data to the users extend
     data, geo = RC.clip_data(name_reprojected, latlim, lonlim)
@@ -200,7 +204,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, LC_Type, hdf_
                     f = urllib.request.urlopen(url)
 
                 if sys.version_info[0] == 2:
-                    f = urllib2.urlopen(url)
+                    f = urllib.request.urlopen(url)
 
                 # Sum all the files on the server
                 soup = BeautifulSoup(f, "lxml")
@@ -216,7 +220,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, LC_Type, hdf_
                             full_url = urllib.parse.urljoin(url, i['href'])
 
                         if sys.version_info[0] == 2:
-                            full_url = urlparse.urljoin(url, i['href'])
+                            full_url = urllib.parse.urljoin(url, i['href'])
 
                         # if not downloaded try to download file
                         while downloaded == 0:
@@ -258,7 +262,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, LC_Type, hdf_
                 # Open .hdf only band with LC and collect all tiles to one array
                 dataset = gdal.Open(file_name)
                 sdsdict = dataset.GetMetadata('SUBDATASETS')
-                sdslist = [sdsdict[k] for k in sdsdict.keys() if '_%d_NAME' %LC_Type in k]
+                sdslist = [sdsdict[k] for k in list(sdsdict.keys()) if '_%d_NAME' %LC_Type in k]
                 sds = []
 
                 for n in sdslist:

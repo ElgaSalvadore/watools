@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Generator/Sheet3
 """
+from builtins import str
 import os
 
 def Create(Dir_Basin, Basin, Simulation, Dir_Basin_CSV_a, Dir_Basin_CSV_b):

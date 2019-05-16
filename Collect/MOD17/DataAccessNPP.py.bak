@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Collect/MOD17
 """
+from __future__ import print_function
 
 # import general python modules
 import os
@@ -133,8 +134,8 @@ def RetrieveData(Date, args):
     name_collect = os.path.join(output_folder, 'Merged.tif')
 
     # Reproject the MODIS product to epsg_to
-    epsg_to ='4326'
-    name_reprojected = RC.reproject_modis_wgs84(name_collect, epsg_to)
+    #epsg_to ='4326'
+    name_reprojected = RC.reproject_modis_wgs84(name_collect, method=2)
 
     # Clip the data to the users extend
     data, geo = RC.clip_data(name_reprojected, latlim, lonlim)
@@ -231,7 +232,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, hdf_library):
                                 nameDownload = full_url
                                 file_name = os.path.join(output_folder,nameDownload.split('/')[-1])
                                 if os.path.isfile(file_name):
-                                    print("file ", file_name, " already exists")
+                                    print(("file ", file_name, " already exists"))
                                     downloaded = 1
                                 else:
                                     """

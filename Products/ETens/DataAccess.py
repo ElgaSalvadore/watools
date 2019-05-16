@@ -7,8 +7,11 @@ Repository: https://github.com/wateraccounting/wa
 Module: Products/ETens
 """
 from __future__ import print_function
+from __future__ import division
 
 # General modules
+from builtins import range
+from past.utils import old_div
 from netCDF4 import Dataset
 import numpy as np
 import os
@@ -34,10 +37,10 @@ def DownloadData(Dir, Startdate, Enddate, latlim, lonlim, Waitbar):
         WaitbarConsole.printWaitBar(amount, total_amount, prefix = 'Progress:', suffix = 'Complete', length = 50)
 
     # Define the minimum and maximum lat and long ETensemble Tile
-    Min_lat_tile = int(np.floor((100 - latlim[1])/10))
-    Max_lat_tile = int(np.floor((100 - latlim[0]-0.00125)/10))
-    Min_lon_tile = int(np.floor((190 + lonlim[0])/10))
-    Max_lon_tile = int(np.floor((190 + lonlim[1]-0.00125)/10))
+    Min_lat_tile = int(np.floor(old_div((100 - latlim[1]),10)))
+    Max_lat_tile = int(np.floor(old_div((100 - latlim[0]-0.00125),10)))
+    Min_lon_tile = int(np.floor(old_div((190 + lonlim[0]),10)))
+    Max_lon_tile = int(np.floor(old_div((190 + lonlim[1]-0.00125),10)))
 
     # Create the Lat and Lon tiles that will be downloaded
     Lat_tiles = [Min_lat_tile, Max_lat_tile]

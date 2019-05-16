@@ -8,6 +8,7 @@ Module:Functions/Start
 
 """
 from __future__ import print_function
+from builtins import str
 def printWaitBar(i, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█'):
     """
     This function will print a waitbar in the console

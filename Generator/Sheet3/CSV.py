@@ -81,8 +81,8 @@ def Create(wp_y_irrigated_dictionary, wp_y_rainfed_dictionary, wp_y_non_crop_dic
     writer_a = csv.writer(csv_file_a, delimiter=';')
     writer_a.writerow(first_row_a)
 
-    for TYPE in wp_y_irrigated_dictionary.keys():
-        for SUBTYPE in wp_y_irrigated_dictionary[TYPE].keys():
+    for TYPE in list(wp_y_irrigated_dictionary.keys()):
+        for SUBTYPE in list(wp_y_irrigated_dictionary[TYPE].keys()):
             if type(wp_y_irrigated_dictionary[TYPE][SUBTYPE]) is type(None):
                 writer_b.writerow(["CROP","IRRIGATED","Yield rainfall",TYPE,SUBTYPE,"nan","nan"])
                 writer_b.writerow(["CROP","IRRIGATED","Incremental yield",TYPE,SUBTYPE,"nan","nan"])
@@ -98,8 +98,8 @@ def Create(wp_y_irrigated_dictionary, wp_y_rainfed_dictionary, wp_y_non_crop_dic
                 writer_a.writerow(["CROP","IRRIGATED","ET rainfall",TYPE,SUBTYPE,WCgreen[mask][0]])
                 writer_a.writerow(["CROP","IRRIGATED","Incremental ET",TYPE,SUBTYPE,WCblue[mask][0]])
 
-    for TYPE in wp_y_rainfed_dictionary.keys():
-        for SUBTYPE in wp_y_rainfed_dictionary[TYPE].keys():
+    for TYPE in list(wp_y_rainfed_dictionary.keys()):
+        for SUBTYPE in list(wp_y_rainfed_dictionary[TYPE].keys()):
             if type(wp_y_rainfed_dictionary[TYPE][SUBTYPE]) is type(None):
                 writer_b.writerow(["CROP","RAINFED","Yield",TYPE,SUBTYPE,"nan","nan"])
                 writer_a.writerow(["CROP","RAINFED","ET",TYPE,SUBTYPE,"nan"])
@@ -109,8 +109,8 @@ def Create(wp_y_irrigated_dictionary, wp_y_rainfed_dictionary, wp_y_non_crop_dic
                 writer_b.writerow(["CROP","RAINFED","Yield",TYPE,SUBTYPE,Y[mask][0],WP[mask][0]])
                 writer_a.writerow(["CROP","RAINFED","ET",TYPE,SUBTYPE,WC[mask][0]])
 
-    for TYPE in wp_y_non_crop_dictionary.keys():
-        for SUBTYPE in wp_y_non_crop_dictionary[TYPE].keys():
+    for TYPE in list(wp_y_non_crop_dictionary.keys()):
+        for SUBTYPE in list(wp_y_non_crop_dictionary[TYPE].keys()):
             if type(wp_y_non_crop_dictionary[TYPE][SUBTYPE]) is type(None):
                 writer_b.writerow(["NON-CROP","RAINFED","Yield",TYPE,SUBTYPE,"nan","nan"])
                 writer_b.writerow(["NON-CROP","IRRIGATED","Yield rainfall",TYPE,SUBTYPE,"nan","nan"])

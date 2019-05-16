@@ -4,6 +4,7 @@ Created on Thu Feb 01 13:15:06 2018
 
 @author: tih
 """
+from __future__ import absolute_import
 import os
 import csv
 import datetime

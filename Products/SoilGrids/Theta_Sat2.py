@@ -7,8 +7,10 @@ Repository: https://github.com/wateraccounting/watools
 Module: Products/SoilGrids
 '''
 from __future__ import print_function
+from __future__ import division
 
 # import general python modules
+from past.utils import old_div
 import os
 import gdal
 import numpy as np
@@ -109,7 +111,7 @@ def Calc_Property(Dir, latlim, lonlim, SL):
         # Calculate bulk density
         #bulk_dens = 1/(0.6117 + 0.3601 * Clay/100 + 0.002172 * np.power(OM * 100, 2)+ 0.01715 * np.log(OM * 100))
         bulk_dens = dest_bulk.GetRasterBand(1).ReadAsArray()
-        bulk_dens = bulk_dens/1000 
+        bulk_dens = old_div(bulk_dens,1000) 
         
         # Calculate theta saturated
         theta_sat = 0.85 * (1- (bulk_dens/2.65)) + 0.13 * Clay/100

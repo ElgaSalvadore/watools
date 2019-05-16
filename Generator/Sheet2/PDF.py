@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Generator/Sheet2
 """
+from builtins import str
 import os
 import glob
 

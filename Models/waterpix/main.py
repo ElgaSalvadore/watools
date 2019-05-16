@@ -9,6 +9,8 @@ Module: waterpix
 
 from __future__ import division
 from __future__ import print_function
+from builtins import str
+from builtins import range
 import datetime as dt
 from warnings import filterwarnings
 import pandas as pd
@@ -68,9 +70,9 @@ def run(input_nc, output_nc,
                                  str(years_ls[j]) + '1231', freq='MS')]
         time_indeces[years_ls[j]] = [time_ls.index(i) for i in temp_ls]
 
-    for key in time_indeces.keys():
-        if time_indeces[key] != range(time_indeces[key][0],
-                                      time_indeces[key][-1] + 1):
+    for key in list(time_indeces.keys()):
+        if time_indeces[key] != list(range(time_indeces[key][0],
+                                      time_indeces[key][-1] + 1)):
             raise Exception('The year {0} in the netcdf file is incomplete'
                             ' or the dates are non-consecutive')
     # Create ouput NetCDF

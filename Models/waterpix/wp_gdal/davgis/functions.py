@@ -11,6 +11,8 @@ GIS workflows used in water resources.
 """
 
 from __future__ import division
+from builtins import str
+from builtins import range
 import os
 import math
 import tempfile
@@ -248,7 +250,7 @@ def Resample(input_tiff, output_tiff, cellsize, method=None,
 
     if method in range(6):
         method_sel = method
-    elif method in method_dict.keys():
+    elif method in list(method_dict.keys()):
         method_sel = method_dict[method]
     else:
         warnings.warn('Using default interpolation method: Nearest Neighbour')

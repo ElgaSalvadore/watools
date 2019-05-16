@@ -32,7 +32,7 @@ def output_nc_to_tiffs(output_nc, output_path):
 
     # Read netcdf file
     nc_file = netCDF4.Dataset(output_nc, 'r')
-    variables_ls = nc_file.variables.keys()
+    variables_ls = list(nc_file.variables.keys())
     time_y = nc_file.variables['time_yyyy'][:]
     time_m = nc_file.variables['time_yyyymm'][:]
     nc_file.close()

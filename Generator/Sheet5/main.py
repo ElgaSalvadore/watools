@@ -5,6 +5,7 @@ Created on Thu Jan 19 10:07:52 2017
 @author: tih
 """
 
+from builtins import range
 def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, ETref_Product, DEM_Product, Water_Occurence_Product,
               Inflow_Text_Files, WaterPIX_filename, Reservoirs_GEE_on_off, Supply_method, Startdate, Enddate,
               Simulation):
@@ -60,7 +61,7 @@ def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, ETref_Product, DEM_P
     ############## Cut dates into pieces if it is needed ######################
 
     # Check the years that needs to be calculated
-    years = range(int(Startdate.split('-')[0]),int(Enddate.split('-')[0]) + 1)
+    years = list(range(int(Startdate.split('-')[0]),int(Enddate.split('-')[0]) + 1))
 
     for year in years:
 

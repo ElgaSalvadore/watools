@@ -10,6 +10,7 @@ import os
 import pandas as pd
 import xml.etree.ElementTree as ET
 import time
+import cairosvg
 
 def create_sheet4(basin, period, units, data, output, template=False, tolerance = 0.01):
     """
@@ -393,7 +394,7 @@ def create_sheet4(basin, period, units, data, output, template=False, tolerance 
         xml_txt_box = tree1.findall('''.//*[@id='units1']''')[0]
         xml_txt_box.getchildren()[0].text = 'Part 1: Manmade ({0})'.format(units[0])
 
-        for key in p1.keys():
+        for key in list(p1.keys()):
             xml_txt_box = tree1.findall(".//*[@id='{0}']".format(key))[0]
             if not pd.isnull(p1[key]):
                 xml_txt_box.getchildren()[0].text = '%.2f' % p1[key]
@@ -411,37 +412,21 @@ def create_sheet4(basin, period, units, data, output, template=False, tolerance 
         xml_txt_box = tree2.findall('''.//*[@id='units2']''')[0]
         xml_txt_box.getchildren()[0].text = 'Part 2: Natural Landuse ({0})'.format(units[1])
 
-        for key in p2.keys():
+        for key in list(p2.keys()):
             xml_txt_box = tree2.findall(".//*[@id='{0}']".format(key))[0]
             if not pd.isnull(p2[key]):
                 xml_txt_box.getchildren()[0].text = '%.2f' % p2[key]
             else:
                 xml_txt_box.getchildren()[0].text = '-'
-
-    ET.register_namespace("", "http://www.w3.org/2000/svg")
-
-    # Get the paths based on the environment variable
-    if os.name == 'posix':
-        Path_Inkscape = 'inkscape'
-
-    else:
-        WA_env_paths = os.environ["WA_PATHS"].split(';')
-        Inkscape_env_path = WA_env_paths[1]
-        Path_Inkscape = os.path.join(Inkscape_env_path,'inkscape.exe')
-
-
+    # Export svg to png
     if data[0] is not None:
         tempout_path = output[0].replace('.pdf', '_temporary.svg')
         tree1.write(tempout_path)
-        fullCmd = (' ').join([Path_Inkscape, tempout_path,'--export-pdf='+output[0], '-d 300'])
-        RC.Run_command_window(fullCmd)
-        time.sleep(10)
+        cairosvg.svg2pdf(url=tempout_path, write_to=output[0])
         os.remove(tempout_path)
 
     if data[1] is not None:
         tempout_path = output[1].replace('.pdf', '_temporary.svg')
         tree2.write(tempout_path)
-        fullCmd = (' ').join([Path_Inkscape, tempout_path,'--export-pdf='+output[1], '-d 300'])
-        RC.Run_command_window(fullCmd)
-        time.sleep(10)
+        cairosvg.svg2pdf(url=tempout_path, write_to=output[1])
         os.remove(tempout_path)

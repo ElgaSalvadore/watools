@@ -8,7 +8,9 @@ Module: watools
 """
 from __future__ import print_function
 # general modules
-import urllib
+from future import standard_library
+standard_library.install_aliases()
+import urllib.request, urllib.parse, urllib.error
 import os
 import zipfile
 import shutil
@@ -22,7 +24,7 @@ def Newest():
     nameDownloadtext = r"https://github.com/wateraccounting/watools/archive/master.zip"
 
     print('Download newest Water Accounting Plus tools')
-    urllib.urlretrieve(nameDownloadtext, file_nametext)
+    urllib.request.urlretrieve(nameDownloadtext, file_nametext)
 
     print('Extract newest Water Accounting Plus tools')
     zip_ref = zipfile.ZipFile(file_nametext, 'r')

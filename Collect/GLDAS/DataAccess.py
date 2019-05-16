@@ -2,6 +2,11 @@
 
 # General modules
 from __future__ import print_function
+from __future__ import division
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import numpy as np
 import calendar
 import os
@@ -236,7 +241,7 @@ def RetrieveData_three_hourly(Date, args):
                     else:
                         data = data * VarFactor
                     if VarInfo.types[Var] == 'flux':
-                        data = data / 8
+                        data = old_div(data, 8)
 
                     # Set Nan value for values lower than -9999
                     data[data < -9999] = -9999
@@ -508,7 +513,7 @@ def RetrieveData_monthly(Date, args):
 
     return True
 
-class VariablesInfo:
+class VariablesInfo(object):
     """
     This class contains the information about the GLDAS variables
     """

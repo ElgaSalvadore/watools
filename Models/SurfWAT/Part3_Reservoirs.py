@@ -5,6 +5,9 @@ Created on Mon Mar 12 15:26:44 2018
 @author: tih
 """
 from __future__ import print_function
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 def Run(input_nc, output_nc, input_JRC):
 
     # Define names
@@ -84,8 +87,8 @@ def Calc_Regions(input_nc, output_nc, input_JRC, Boundaries):
     del basin_array
 
     # sum larger areas to find lakes
-    x_size=np.round(int(np.shape(Array_JRC_occ)[0])/30)
-    y_size=np.round(int(np.shape(Array_JRC_occ)[1])/30)
+    x_size=np.round(old_div(int(np.shape(Array_JRC_occ)[0]),30))
+    y_size=np.round(old_div(int(np.shape(Array_JRC_occ)[1]),30))
     sum_array = np.zeros([x_size, y_size])
 
     for i in range(0,len(sum_array)):
@@ -129,15 +132,15 @@ def Calc_Regions(input_nc, output_nc, input_JRC, Boundaries):
     for i in range(1,k):
         added = 0
         lake_info_one = lake_info[i,:]
-        lake_y_region = range(int(lake_info_one[0]),int(lake_info_one[1]+1))
-        lake_x_region = range(int(lake_info_one[2]),int(lake_info_one[3]+1))
+        lake_y_region = list(range(int(lake_info_one[0]),int(lake_info_one[1]+1)))
+        lake_x_region = list(range(int(lake_info_one[2]),int(lake_info_one[3]+1)))
 
         for j in range(0,p+1):
-            if len(lake_y_region)+len(range(int(lake_info_end[j,0]),int(lake_info_end[j,1]+1))) is not len(np.unique(np.append(lake_y_region,range(int(lake_info_end[j,0]),int(lake_info_end[j,1]+1))))) and len(lake_x_region)+len(range(int(lake_info_end[j,2]),int(lake_info_end[j,3]+1))) is not len(np.unique(np.append(lake_x_region,range(int(lake_info_end[j,2]),int(lake_info_end[j,3]+1))))):
-                lake_info_end[j,0] = np.min(np.unique(np.append(lake_y_region,range(int(lake_info_end[j,0]),int(lake_info_end[j,1]+1)))))
-                lake_info_end[j,1] = np.max(np.unique(np.append(lake_y_region,range(int(lake_info_end[j,0]),int(lake_info_end[j,1]+1)))))
-                lake_info_end[j,2] = np.min(np.unique(np.append(lake_x_region,range(int(lake_info_end[j,2]),int(lake_info_end[j,3]+1)))))
-                lake_info_end[j,3] = np.max(np.unique(np.append(lake_x_region,range(int(lake_info_end[j,2]),int(lake_info_end[j,3]+1)))))
+            if len(lake_y_region)+len(list(range(int(lake_info_end[j,0]),int(lake_info_end[j,1]+1)))) is not len(np.unique(np.append(lake_y_region,list(range(int(lake_info_end[j,0]),int(lake_info_end[j,1]+1)))))) and len(lake_x_region)+len(list(range(int(lake_info_end[j,2]),int(lake_info_end[j,3]+1)))) is not len(np.unique(np.append(lake_x_region,list(range(int(lake_info_end[j,2]),int(lake_info_end[j,3]+1)))))):
+                lake_info_end[j,0] = np.min(np.unique(np.append(lake_y_region,list(range(int(lake_info_end[j,0]),int(lake_info_end[j,1]+1))))))
+                lake_info_end[j,1] = np.max(np.unique(np.append(lake_y_region,list(range(int(lake_info_end[j,0]),int(lake_info_end[j,1]+1))))))
+                lake_info_end[j,2] = np.min(np.unique(np.append(lake_x_region,list(range(int(lake_info_end[j,2]),int(lake_info_end[j,3]+1))))))
+                lake_info_end[j,3] = np.max(np.unique(np.append(lake_x_region,list(range(int(lake_info_end[j,2]),int(lake_info_end[j,3]+1))))))
                 added = 1
 
         if added == 0:
@@ -325,9 +328,9 @@ def Find_Area_Volume_Relation(region, input_JRC, input_nc):
             plt.plot(t, popt[0]*(t-popt[2])**popt[1] + popt[3], 'g--')
             plt.axis([0, np.max(Reservoir_characteristics[mini:maxi_end,2]), 0, np.max(Reservoir_characteristics[mini:maxi_end,3])])
             plt.show()
-            Volume_error = popt[3]/V0 * 100 - 100
+            Volume_error = old_div(popt[3],V0 * 100) - 100
             print('error Volume = %s percent' %Volume_error)
-            print('error Area = %s percent' %(A0/popt[2] * 100 - 100))
+            print('error Area = %s percent' %(old_div(A0,popt[2] * 100) - 100))
 
             if Volume_error < 30 and Volume_error > -30:
                 done = 1
@@ -451,7 +454,7 @@ def Calc_Diff_Storage(Area_Reservoir_Values, popt):
                         p = i
 
 
-            Water_area_m2[i,2] = (Water_area_m2[p,2] + Water_area_m2[i-1,2])/(2)
+            Water_area_m2[i,2] = old_div((Water_area_m2[p,2] + Water_area_m2[i-1,2]),(2))
 
 
     # Get the Q-A relation
@@ -519,7 +522,7 @@ def Add_Reservoirs(output_nc, Diff_Water_Volume, Regions):
         ID_reservoir = Rivers_ID_reservoir[y_pix_res,x_pix_res]
 
         # Find exact reservoir area in river directory
-        for River_part in River_dict.iteritems():
+        for River_part in River_dict.items():
             if len(np.argwhere(River_part[1] == ID_reservoir)) > 0:
                  Reservoir_is_in_River[reservoir, 0] = np.argwhere(River_part[1] == ID_reservoir) #River_part_good
                  Reservoir_is_in_River[reservoir, 1] = River_part[0]  #River_Add_Reservoir
@@ -546,7 +549,7 @@ def Add_Reservoirs(output_nc, Diff_Water_Volume, Regions):
 
             Difference = Change_outflow_m3 - Change_Reservoir_m3
             if abs(np.sum(Difference))>10000 and np.sum(Change_Reservoir_m3[Change_outflow_m3>0])>0:
-                Change_outflow_m3[Change_outflow_m3<0] = Change_outflow_m3[Change_outflow_m3<0]*np.sum(Change_outflow_m3[Change_outflow_m3>0])/np.sum(Change_Reservoir_m3[Change_outflow_m3>0])
+                Change_outflow_m3[Change_outflow_m3<0] = old_div(Change_outflow_m3[Change_outflow_m3<0]*np.sum(Change_outflow_m3[Change_outflow_m3>0]),np.sum(Change_Reservoir_m3[Change_outflow_m3>0]))
 
             # Find key name (which is also the lenght of the river dictionary)
             i = len(River_dict)
@@ -568,7 +571,7 @@ def Add_Reservoirs(output_nc, Diff_Water_Volume, Regions):
 
             times = 0
             while len(River_dict) > times:
-               for River_part in River_dict.iteritems():
+               for River_part in River_dict.items():
                    if River_part[-1][-1] == Next_ID:
                        Next_ID = River_part[-1][0]
                        item = River_part[0]

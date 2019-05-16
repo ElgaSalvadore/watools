@@ -6,8 +6,10 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/watools
 Module: Function/Four
 """
+from __future__ import division
 
 # import general python modules
+from past.utils import old_div
 import pandas as pd
 import numpy as np
 import os
@@ -46,7 +48,7 @@ def Blue_Green(Dir_Basin, nc_outname, ETref_Product, P_Product, Startdate, Endda
 
     # Get dictionaries and keys for the moving average
     ET_Blue_Green_Classes_dict, Moving_Window_Per_Class_dict = GD.get_bluegreen_classes(version = '1.0')
-    Classes = ET_Blue_Green_Classes_dict.keys()
+    Classes = list(ET_Blue_Green_Classes_dict.keys())
     Moving_Averages_Values_Array = np.ones(LU.shape) * np.nan
 
     # Create array based on the dictionary that gives the Moving average tail for every pixel
@@ -118,10 +120,10 @@ def Blue_Green(Dir_Basin, nc_outname, ETref_Product, P_Product, Startdate, Endda
     mask = np.any([np.isnan(LU)*np.ones([len(Dates),int(LU.shape[0]),int(LU.shape[1])])==1, np.isnan(ET), np.isnan(ETref[int(ETref.shape[0])-len(Dates):,:,:]), np.isnan(P[int(ETref.shape[0])-len(Dates):,:,:]), np.isnan(P_Ave), np.isnan(ETref_Ave)],axis=0)
     ETref_period[mask] = ETref_Ave[mask] = ET[mask] = P_period[mask] = P_Ave[mask] = np.nan
 
-    phi = ETref_Ave / P_Ave
+    phi = old_div(ETref_Ave, P_Ave)
 
     # Calculate Budyko-index
-    Budyko = scale * np.sqrt(phi*np.tanh(1/phi)*(1-np.exp(-phi)))
+    Budyko = scale * np.sqrt(phi*np.tanh(old_div(1,phi))*(1-np.exp(-phi)))
 
     # Calculate ET green
     ETgreen_DataCube = np.minimum(Budyko*P[int(ETref.shape[0])-len(Dates):,:,:],ET)
@@ -146,7 +148,7 @@ def Calc_budyko(phi):
               Array[time, lat, lon] containing Budyko number
     """
 
-    Budyko = np.sqrt(phi * np.tanh(1/phi) * (1-np.exp(-phi)))
+    Budyko = np.sqrt(phi * np.tanh(old_div(1,phi)) * (1-np.exp(-phi)))
 
     return(Budyko)
 

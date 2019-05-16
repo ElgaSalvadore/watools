@@ -4,6 +4,7 @@ Created on Mon Mar 12 15:26:44 2018
 
 @author: tih
 """
+from __future__ import print_function
 def Run(input_nc, output_nc, input_JRC):
 
     # Define names

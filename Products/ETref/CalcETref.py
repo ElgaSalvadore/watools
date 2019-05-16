@@ -7,7 +7,9 @@ Contact: b.coerver@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Products/ETref
 '''
+from __future__ import division
 # import general python modules
+from past.utils import old_div
 import gdal
 import numpy as np
 
@@ -99,10 +101,10 @@ def calc_ETref(Dir, tmin_str, tmax_str, humid_str, press_str, wind_str, down_sho
         dest = None
 
         # Calculate Long wave Net radiation
-        Rnl = 4.903e-9 * (((tmin + 273.16)**4+(tmax + 273.16)**4)/2)*(0.34 - 0.14 * np.sqrt(ea)) * (1.35 * Short_Net_data/Short_Clear_data -0.35)
+        Rnl = 4.903e-9 * (old_div(((tmin + 273.16)**4+(tmax + 273.16)**4),2))*(0.34 - 0.14 * np.sqrt(ea)) * (1.35 * Short_Net_data/Short_Clear_data -0.35)
 
         # Calulate Net Radiation and converted to MJ*d-1*m-2
-        net_radiation = (Short_Net_data * 0.77 + Rnl)*86400/10**6
+        net_radiation = old_div((Short_Net_data * 0.77 + Rnl)*86400,10**6)
 
 
     else:
@@ -124,14 +126,14 @@ def calc_ETref(Dir, tmin_str, tmax_str, humid_str, press_str, wind_str, down_sho
         dest = None
 
         #OPEN NET RADIATION AND CONVERT W*m-2 TO MJ*d-1*m-2
-        net_radiation = ((down_short-up_short) + (down_long-up_long))*86400/10**6
+        net_radiation = old_div(((down_short-up_short) + (down_long-up_long))*86400,10**6)
 
 
     #CALCULATE ETref
-    ETref = (0.408 * delta * net_radiation + 0.665*10**-3 *
-        press * (900/((tmax+tmin)/2 + 273)) *
-        wind * (es - ea)) / (delta + 0.665*10**-3 *
-        press * (1 + 0.34 * wind))
+    ETref = old_div((0.408 * delta * net_radiation + 0.665*10**-3 *
+        press * (old_div(900,(old_div((tmax+tmin),2) + 273))) *
+        wind * (es - ea)), (delta + 0.665*10**-3 *
+        press * (1 + 0.34 * wind)))
 
     # Set limits ETref
     ETref[ETref<0]=0

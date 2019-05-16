@@ -8,6 +8,7 @@ Module: waterpix
 """
 
 from __future__ import division
+from builtins import range
 from math import exp, sqrt
 import pandas as pd
 from scipy.optimize import minimize_scalar
@@ -394,7 +395,7 @@ def return_empty_df_columns(df):
         if hvar not in col_names:
             cols.append(hvar)
     # Data frame concatenation
-    df = pd.concat([df, pd.DataFrame(index=range(12),
+    df = pd.concat([df, pd.DataFrame(index=list(range(12)),
                                      columns=cols)],
                    axis=1)
     # Return data frame

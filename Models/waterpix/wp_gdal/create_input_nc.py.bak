@@ -8,6 +8,7 @@ Module: waterpix
 """
 
 from __future__ import division
+from __future__ import print_function
 import os
 import tempfile
 from .davgis import (Spatial_Reference, Buffer, Feature_to_Raster, Resample,
@@ -27,7 +28,7 @@ def create_input_nc(start_date, years,
     Creates the input netcdf file required to run waterpix
     """
     # Script parameters
-    print "Variable\tRaster"
+    print("Variable\tRaster")
     if bbox:
         latlim = [bbox[1], bbox[3]]
         lonlim = [bbox[0], bbox[2]]
@@ -218,7 +219,7 @@ def create_input_nc(start_date, years,
     # Static variables
 
     # Theta sat
-    print "{0}\t{1}".format('thetasat', thetasat_ras)
+    print("{0}\t{1}".format('thetasat', thetasat_ras))
     thetasat_temp1 = os.path.join(temp_dir1, 'thetasat1.tif')
     thetasat_temp2 = os.path.join(temp_dir1, 'thetasat2.tif')
     Resample(thetasat_ras, thetasat_temp1, cellsize, 'NearestNeighbour')
@@ -228,7 +229,7 @@ def create_input_nc(start_date, years,
     thetasat_var[:, :] = array_thetasat[:, :]
 
     # Root depth
-    print "{0}\t{1}".format('rootdepth', rootdepth_ras)
+    print("{0}\t{1}".format('rootdepth', rootdepth_ras))
     rootdepth_temp1 = os.path.join(temp_dir1, 'rootdepth1.tif')
     rootdepth_temp2 = os.path.join(temp_dir1, 'rootdepth2.tif')
     Resample(rootdepth_ras, rootdepth_temp1, cellsize, 'NearestNeighbour')
@@ -238,7 +239,7 @@ def create_input_nc(start_date, years,
     rootdepth_var[:, :] = array_rootdepth[:, :]
 
     # Basin mask
-    print "{0}\t{1}".format('basin_mask', basin_ras)
+    print("{0}\t{1}".format('basin_mask', basin_ras))
     basinmask_temp1 = os.path.join(temp_dir1, 'basinmask1.tif')
     basinmask_temp2 = os.path.join(temp_dir1, 'basinmask2.tif')
     Resample(basin_ras, basinmask_temp1, cellsize, 'NearestNeighbour')
@@ -258,7 +259,7 @@ def create_input_nc(start_date, years,
             yyyy = yyyymm[:4]
             mm = yyyymm[-2:]
             ras = all_paths[var].format(yyyy=yyyy, mm=mm)
-            print "{0}\t{1}".format(var, ras)
+            print("{0}\t{1}".format(var, ras))
             Resample(ras, os.path.join(temp_dir2, os.path.basename(ras)),
                      cellsize, 'NearestNeighbour')
             Clip(os.path.join(temp_dir2, os.path.basename(ras)),
@@ -275,7 +276,7 @@ def create_input_nc(start_date, years,
     for yyyy in years_ls:
         for yyyymm in time_ls:
             ras = all_paths['qratio'].format(yyyy=yyyy)
-            print "{0}\t{1}".format('qratio', ras)
+            print("{0}\t{1}".format('qratio', ras))
             Resample(ras, os.path.join(temp_dir2, os.path.basename(ras)),
                      cellsize, 'NearestNeighbour')
             Clip(os.path.join(temp_dir2, os.path.basename(ras)),

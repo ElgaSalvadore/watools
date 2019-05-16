@@ -10,11 +10,15 @@ Module: Collect/MOD16
 from __future__ import print_function
 
 # import general python modules
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 import os
 import numpy as np
 import pandas as pd
 import gdal
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import re
 import glob
 from joblib import Parallel, delayed
@@ -26,7 +30,7 @@ import requests
 if sys.version_info[0] == 3:
     import urllib.parse
 if sys.version_info[0] == 2:
-    import urllib2
+    import urllib.request, urllib.error, urllib.parse
 
 # Water Accounting modules
 import watools
@@ -128,8 +132,8 @@ def RetrieveData(Date, args):
     name_collect = os.path.join(output_folder, 'Merged.tif')
 
     # Reproject the MODIS product to epsg_to
-    epsg_to ='4326'
-    name_reprojected = RC.reproject_modis_wgs84(name_collect, epsg_to)
+    #epsg_to ='4326'
+    name_reprojected = RC.reproject_modis_wgs84(name_collect, method=2)
 
     # Clip the data to the users extend
     data, geo = RC.clip_data(name_reprojected, latlim, lonlim)
@@ -209,7 +213,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder,timestep, hdf_
                     f = urllib.request.urlopen(url)
 
                 if sys.version_info[0] == 2:
-                    f = urllib2.urlopen(url)
+                    f = urllib.request.urlopen(url)
 
                 # Sum all the files on the server
                 soup = BeautifulSoup(f, "lxml")
@@ -234,7 +238,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder,timestep, hdf_
                                     while downloaded == 0:
     
                                         if sys.version_info[0] == 2:
-                                            urllib.urlretrieve(HTTP_name,output_name)
+                                            urllib.request.urlretrieve(HTTP_name,output_name)
                                         if sys.version_info[0] == 3:
                                             urllib.request.urlretrieve(HTTP_name,output_name)
     
@@ -326,7 +330,7 @@ def Open_mod16_data(output_name):
 
     dataset=gdal.Open(output_name)
     sdsdict=dataset.GetMetadata('SUBDATASETS')
-    sdslist =[sdsdict[k] for k in sdsdict.keys() if '_1_NAME' in k]
+    sdslist =[sdsdict[k] for k in list(sdsdict.keys()) if '_1_NAME' in k]
     sds=[]
 
     sds=gdal.Open(sdslist[0])

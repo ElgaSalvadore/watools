@@ -5,6 +5,10 @@ Created on Fri Dec 16 19:04:22 2016
 @author: tih
 """
 from __future__ import print_function
+from __future__ import division
+from builtins import str
+from builtins import range
+from past.utils import old_div
 import pandas as pd
 import glob
 from osgeo import gdal, osr
@@ -105,8 +109,8 @@ def Open_nc_info(NC_filename, Var = None):
 
     Geo6 = fh.variables['latitude'].pixel_size
     Geo2 = fh.variables['longitude'].pixel_size
-    Geo4 = np.max(lats) + Geo6/2
-    Geo1 = np.min(lons) - Geo2/2
+    Geo4 = np.max(lats) + old_div(Geo6,2)
+    Geo1 = np.min(lons) - old_div(Geo2,2)
 
     crso = fh.variables['crs']
     proj = crso.projection
@@ -134,7 +138,7 @@ def Open_nc_array(NC_filename, Var = None, Startdate = '', Enddate = ''):
 
     fh = Dataset(NC_filename, mode='r')
     if Var == None:
-        Var = fh.variables.keys()[-1]
+        Var = list(fh.variables.keys())[-1]
 
     if Startdate is not '':
         Time = fh.variables['time'][:]
@@ -209,7 +213,7 @@ def Open_ncs_array(NC_Directory, Var, Startdate, Enddate):
     panda_start = pd.Timestamp(Startdate)
     panda_end = pd.Timestamp(Enddate)
 
-    years = range(int(panda_start.year), int(panda_end.year)+1)
+    years = list(range(int(panda_start.year), int(panda_end.year)+1))
     Data_end = []
     for year in years:
 
@@ -283,7 +287,7 @@ def Open_nc_dict(input_netcdf, group_name, startdate = '', enddate = ''):
             # If the array is dynamic add a 2D array
             if kind_of_data == 'dynamic':
                 tot_length = len(np.fromstring(Array_text,sep = ' '))
-                dictionary[int(number_val)] = np.fromstring(Array_text,sep = ' ').reshape((int(Amount_months), int(tot_length/Amount_months)))
+                dictionary[int(number_val)] = np.fromstring(Array_text,sep = ' ').reshape((int(Amount_months), int(old_div(tot_length,Amount_months))))
             # If the array is static add a 1D array
             else:
                 dictionary[int(number_val)] = np.fromstring(Array_text,sep = ' ')
@@ -318,7 +322,7 @@ def Open_nc_dict(input_netcdf, group_name, startdate = '', enddate = ''):
             if End == '':
                 End = len(time_dates)
 
-            for key in dictionary.iterkeys():
+            for key in dictionary.keys():
 
                 Array = dictionary[key][:,:]
                 Array_new = Array[int(Start):int(End),:]
@@ -372,11 +376,11 @@ def clip_data(input_file, latlim, lonlim, output_name = None):
     # Define the array that must remain
     Geo_in = dest_in.GetGeoTransform()
     Geo_in = list(Geo_in)
-    Start_x = np.max([int(np.floor(((lonlim[0]) - Geo_in[0])/ Geo_in[1])),0])
-    End_x = np.min([int(np.ceil(((lonlim[1]) - Geo_in[0])/ Geo_in[1])),int(dest_in.RasterXSize)])
+    Start_x = np.max([int(np.floor(old_div(((lonlim[0]) - Geo_in[0]), Geo_in[1]))),0])
+    End_x = np.min([int(np.ceil(old_div(((lonlim[1]) - Geo_in[0]), Geo_in[1]))),int(dest_in.RasterXSize)])
 
-    Start_y = np.max([int(np.floor((Geo_in[3] - latlim[1])/ -Geo_in[5])),0])
-    End_y = np.min([int(np.ceil(((latlim[0]) - Geo_in[3])/Geo_in[5])), int(dest_in.RasterYSize)])
+    Start_y = np.max([int(np.floor(old_div((Geo_in[3] - latlim[1]), -Geo_in[5]))),0])
+    End_y = np.min([int(np.ceil(old_div(((latlim[0]) - Geo_in[3]),Geo_in[5]))), int(dest_in.RasterYSize)])
 
     #Create new GeoTransform
     Geo_in[0] = Geo_in[0] + Start_x * Geo_in[1]
@@ -461,8 +465,8 @@ def reproject_dataset_epsg(dataset, pixel_spacing, epsg_to, method = 2):
     # The size of the raster is given the new projection and pixel spacing
     # Using the values we calculated above. Also, setting it to store one band
     # and to use Float32 data type.
-    col = int((lrx - ulx)/pixel_spacing)
-    rows = int((uly - lry)/pixel_spacing)
+    col = int(old_div((lrx - ulx),pixel_spacing))
+    rows = int(old_div((uly - lry),pixel_spacing))
 
     # Re-define lr coordinates based on whole number or rows and columns
     (lrx, lry) = (ulx + col * pixel_spacing, uly -
@@ -481,13 +485,13 @@ def reproject_dataset_epsg(dataset, pixel_spacing, epsg_to, method = 2):
     dest.SetProjection(osng.ExportToWkt())
 
     # Perform the projection/resampling
-    if method is 1:
+    if method == 1:
         gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(),gdal.GRA_NearestNeighbour)
-    if method is 2:
+    if method == 2:
         gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(),gdal.GRA_Bilinear)
-    if method is 3:
+    if method == 3:
         gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(), gdal.GRA_Lanczos)
-    if method is 4:
+    if method == 4:
         gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(), gdal.GRA_Average)
     return dest, ulx, lry, lrx, uly, epsg_to
 
@@ -558,13 +562,13 @@ def reproject_modis_wgs84(dataset, method = 2):
     # The size of the raster is given the new projection and pixel spacing
     # Using the values we calculated above. Also, setting it to store one band
     # and to use Float32 data type.
-    col = int((lrx - ulx)/pixel_spacing)
-    rows = int((uly - lry)/pixel_spacing)
+    col = int(old_div((lrx - ulx),pixel_spacing))
+    rows = int(old_div((uly - lry),pixel_spacing))
 
     # Re-define lr coordinates based on whole number or rows and columns
     (lrx, lry) = (ulx + col * pixel_spacing, uly -
                   rows * pixel_spacing)
-    name_reprojected= ''.join(dataset.split(".")[:-1]) + '_reprojected.tif'
+    name_reprojected = ''.join(dataset.split(".")[:-1]) + '_reprojected.tif'
     dest = mem_drv.Create(name_reprojected, col, rows, 1, gdal.GDT_Float32)
     b = dest.GetRasterBand(1)
     b.SetNoDataValue(-9999)
@@ -580,13 +584,13 @@ def reproject_modis_wgs84(dataset, method = 2):
     dest.SetProjection(wgs84.ExportToWkt())
     
     # Perform the projection/resampling
-    if method is 1:
+    if method == 1:
         gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(),gdal.GRA_NearestNeighbour)
-    if method is 2:
+    if method == 2:
         gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(),gdal.GRA_Bilinear)
-    if method is 3:
+    if method == 3:
         gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(), gdal.GRA_Lanczos)
-    if method is 4:
+    if method == 4:
         gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(), gdal.GRA_Average)
     
 #    name_reprojected= ''.join(dataset.split(".")[:-1]) + '_reprojected2.tif'
@@ -960,8 +964,8 @@ def Vector_to_Raster(Dir, shapefile_name, reference_raster_data_name):
     source_layer = source_ds.GetLayer()
 
     # Create the destination data source
-    x_res = int(round((x_max - x_min) / pixel_size))
-    y_res = int(round((y_max - y_min) / pixel_size))
+    x_res = int(round(old_div((x_max - x_min), pixel_size)))
+    y_res = int(round(old_div((y_max - y_min), pixel_size)))
 
     # Create tiff file
     target_ds = gdal.GetDriverByName('GTiff').Create(Dir_Raster_end, x_res, y_res, 1, gdal.GDT_Float32, ['COMPRESS=LZW'])

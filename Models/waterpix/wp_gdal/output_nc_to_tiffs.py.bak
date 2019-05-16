@@ -6,6 +6,7 @@ Contact: g.espinoza@un-ihe.org
 Repository: https://github.com/gespinoza/waterpix
 Module: waterpix
 """
+from __future__ import print_function
 
 import os
 from .davgis import NetCDF_to_Raster
@@ -58,7 +59,7 @@ def output_nc_to_tiffs(output_nc, output_path):
         # Yearly rasters
         if '_Y' in variable:
             for time in time_y:
-                print '{0}\t{1}'.format(variable, time)
+                print('{0}\t{1}'.format(variable, time))
                 file_name = variable[:-1] + '{0}.tif'.format(time)
                 output_tiff = os.path.join(path_y, variable, file_name)
                 NetCDF_to_Raster(output_nc, output_tiff, variable,
@@ -69,10 +70,10 @@ def output_nc_to_tiffs(output_nc, output_path):
         # Monthly rasters
         elif '_M' in variable:
             for time in time_m:
-                print '{0}\t{1}'.format(variable, time)
+                print('{0}\t{1}'.format(variable, time))
                 file_name = variable[:-1] + '{0}.tif'.format(time)
                 output_tiff = os.path.join(path_m, variable, file_name)
-                print output_tiff
+                print(output_tiff)
                 NetCDF_to_Raster(output_nc, output_tiff, variable,
                                  x_variable='longitude',
                                  y_variable='latitude',
@@ -80,7 +81,7 @@ def output_nc_to_tiffs(output_nc, output_path):
                                        'value': time})
         # Additional rasters
         else:
-            print '{0}'.format(variable)
+            print('{0}'.format(variable))
             file_name = variable[:-1] + '.tif'
             output_tiff = os.path.join(path_a, variable, file_name)
             NetCDF_to_Raster(output_nc, output_tiff, variable,

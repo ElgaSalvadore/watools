@@ -25,6 +25,7 @@ ALEXI.monthly(Dir='C:/Temp/', Startdate='2003-02-24', Enddate='2003-03-09',
 """
 from __future__ import print_function
 # General modules
+from builtins import str
 import numpy as np
 import os
 import pandas as pd

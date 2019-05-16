@@ -7,7 +7,10 @@ Repository: https://github.com/wateraccounting/wa
 Module: Function/Two
 """
 from __future__ import print_function
+from __future__ import division
 # import general python modules
+from builtins import range
+from past.utils import old_div
 import os
 import gdal
 import numpy as np
@@ -54,7 +57,7 @@ def NPP_GPP_Based(Dir_Basin, Data_Path_GPP, Data_Path_NPP, Startdate, Enddate):
     # Define the years that will be calculated
     Year_Start = int(Startdate[0:4])
     Year_End = int(Enddate[0:4])
-    Years = range(Year_Start, Year_End+1)
+    Years = list(range(Year_Start, Year_End+1))
 
     # Loop over the years
     for year in Years:
@@ -132,7 +135,7 @@ def NPP_GPP_Based(Dir_Basin, Data_Path_GPP, Data_Path_NPP, Startdate, Enddate):
                 monthly_GPP[monthly_GPP == NDV] = np.nan
 
                 # Calculate the NDM based on the monthly and yearly NPP and GPP (fraction of GPP)
-                Monthly_NDM = Yearly_NPP * monthly_GPP / Yearly_GPP * (30./12.) *10000 # kg/ha
+                Monthly_NDM = old_div(Yearly_NPP * monthly_GPP, Yearly_GPP * (30./12.) *10000) # kg/ha
 
                 # Define output name
                 output_name = os.path.join(Data_Path_NDM, 'NDM_MOD17_kg_ha-1_monthly_%d.%02d.01.tif' %(int(year), int(month)))

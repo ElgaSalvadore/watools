@@ -10,6 +10,8 @@ Module: Collect/GLEAM
 from __future__ import print_function
 
 # import general python modules
+from builtins import str
+from builtins import range
 import os
 import numpy as np
 import pandas as pd
@@ -46,7 +48,7 @@ def DownloadData(Dir, Startdate, Enddate, latlim, lonlim, Waitbar, cores, TimeCa
     # Make an array of the days of which the ET is taken
     YearsDownloadstart = str(Startdate[0:4])
     YearsDownloadend = str(Enddate[0:4])
-    Years = range(int(YearsDownloadstart),int(YearsDownloadend)+1)
+    Years = list(range(int(YearsDownloadstart),int(YearsDownloadend)+1))
 
     # String Parameters
     if TimeCase == 'daily':

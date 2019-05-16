@@ -7,8 +7,10 @@ Repository: https://github.com/wateraccounting/wa
 Module: Products/ETref
 '''
 from __future__ import print_function
+from __future__ import division
 
 # import general python modules
+from past.utils import old_div
 import os
 import gdal
 import numpy as np
@@ -81,7 +83,7 @@ def CollectLANDSAF(SourceLANDSAF, Dir, Startdate, Enddate, latlim, lonlim):
         SISdata=SISdest.GetRasterBand(1).ReadAsArray()
 
         # Calculate ShortWave net
-        Short_Wave_Net = SIDdata * (Sloping/Horizontal)+SISdata *86400/1e6
+        Short_Wave_Net = SIDdata * (old_div(Sloping,Horizontal))+old_div(SISdata *86400,1e6)
 
         # Calculate ShortWave Clear
         Short_Wave = Sloping

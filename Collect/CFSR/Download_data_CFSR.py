@@ -7,6 +7,7 @@ Module: Collect/CFSR
 """
 from __future__ import print_function
 # General modules
+from builtins import str
 import os
 import pycurl
 

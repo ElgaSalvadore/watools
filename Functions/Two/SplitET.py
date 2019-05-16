@@ -6,14 +6,19 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Function/Two
 """
+from __future__ import division
 
 # import general python modules
+from builtins import range
+from past.utils import old_div
 import pandas as pd
 import numpy as np
 import datetime
 import os
 import sys
 import matplotlib.pyplot as plt
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 
 def ITE(Dir_Basin, nc_outname, Startdate, Enddate, Simulation):
     """
@@ -55,7 +60,7 @@ def ITE(Dir_Basin, nc_outname, Startdate, Enddate, Simulation):
 
     # Create a mask to ignore non relevant pixels.
     if sys.version_info[0] == 2:
-        lulc_dict = GD.get_lulcs().keys()
+        lulc_dict = list(GD.get_lulcs().keys())
         mask=np.logical_or.reduce([LU == value for value in lulc_dict[:-1]])
     if sys.version_info[0] == 3:
         lulc_dict = list(GD.get_lulcs().keys())
@@ -92,7 +97,7 @@ def ITE(Dir_Basin, nc_outname, Startdate, Enddate, Simulation):
     for month in range(1,13):
         dimensions = []
         # Define which dimension must be opened to get the same month
-        for dimension, monthdict in datesNDMmonth.items():
+        for dimension, monthdict in list(datesNDMmonth.items()):
             if monthdict == month:
                 dimensions = np.append(dimensions,dimension)
         # Open those time dimension
@@ -121,13 +126,13 @@ def ITE(Dir_Basin, nc_outname, Startdate, Enddate, Simulation):
     NDM[NDM == -9999] = 0.    
 
     # Calculate I
-    I = LAI * (1 - np.power(1 + (P/RD) * (1 - np.exp(-0.5 * LAI)) * (1/LAI),-1)) * RD
+    I = LAI * (1 - np.power(1 + (old_div(P,RD)) * (1 - np.exp(-0.5 * LAI)) * (old_div(1,LAI)),-1)) * RD
 
     # Set boundary
     I[np.isnan(LAI)] = np.nan
 
     # Calculate T
-    T = np.minimum((NDM/NDMmax_months),np.ones(np.shape(NDM))) * 0.95 * (ET - I)
+    T = np.minimum((old_div(NDM,NDMmax_months)),np.ones(np.shape(NDM))) * 0.95 * (ET - I)
 
     # Mask Data
     ET = ET * mask3d
@@ -169,7 +174,7 @@ def ITE(Dir_Basin, nc_outname, Startdate, Enddate, Simulation):
     ax.set_xlim([Dates[0], Dates[-1]])
     ax.set_ylim([0, max(et) * 1.2])
     ax.set_xlabel('Time')
-    [r.set_zorder(10) for r in iter(ax.spines.values())]
+    [r.set_zorder(10) for r in iter(list(ax.spines.values()))]
 
     # Define output folder and name for image
     NamePic = "Sim%s_Mean_ET_E_T_I.jpg" %Simulation

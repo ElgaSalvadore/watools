@@ -4,7 +4,10 @@ Created on Tue Oct 03 10:16:06 2017
 
 @author: tih
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 def Get_Array(nc_filename_waterpix, Var_name, Example_dataset, Startdate, Enddate):
 
     #import general modules
@@ -72,8 +75,8 @@ def Get_Array(nc_filename_waterpix, Var_name, Example_dataset, Startdate, Enddat
     # Find WaterPIX raster parameters
     col = int(len(lon))
     row = int(len(lat))
-    y_diff = (lat[0] - lat[-1])/(row - 1)
-    x_diff = (lon[0] - lon[-1])/(col - 1)
+    y_diff = old_div((lat[0] - lat[-1]),(row - 1))
+    x_diff = old_div((lon[0] - lon[-1]),(col - 1))
     geo = tuple([lon[0] + 0.5 * x_diff, -x_diff, 0.0, lat[0] + 0.5 * y_diff, 0.0, -y_diff])
 
     # Find example raster parameters

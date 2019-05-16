@@ -7,6 +7,7 @@ Repository: https://github.com/wateraccounting/wa
 Module: Function/Four
 """
 # import general python modules
+from builtins import range
 import os
 import numpy as np
 import pandas as pd
@@ -73,7 +74,7 @@ def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, LAI_Product, ETref_P
     ############## Cut dates into pieces if it is needed ######################
 
     # Check the years that needs to be calculated
-    years = range(int(Startdate.split('-')[0]),int(Enddate.split('-')[0]) + 1)
+    years = list(range(int(Startdate.split('-')[0]),int(Enddate.split('-')[0]) + 1))
 
     for year in years:
 
@@ -169,7 +170,7 @@ def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, LAI_Product, ETref_P
 
     ############## Cut dates into pieces if it is needed ######################
 
-    years = range(int(Startdate.split('-')[0]),int(Enddate.split('-')[0]) + 1)
+    years = list(range(int(Startdate.split('-')[0]),int(Enddate.split('-')[0]) + 1))
 
     for year in years:
 

@@ -7,6 +7,7 @@ Repository: https://github.com/wateraccounting/watools
 Module: Function/Two
 """
 
+from builtins import zip
 def get_lulcs(lulc_version = '4.0'):
 
     lulc_v40 = {
@@ -311,7 +312,7 @@ def get_sheet1_classes(lulc_version = '4.0'):
     categories = ['Protected', 'Utilized', 'Modified', 'Managed']
     sheet1_classes = dict()
     for cat in categories:
-        sheet1_classes[cat] = [key for key, value in zip(lulc_dict.keys(), lulc_dict.values()) if value[1] == cat]
+        sheet1_classes[cat] = [key for key, value in zip(list(lulc_dict.keys()), list(lulc_dict.values())) if value[1] == cat]
 
     return sheet1_classes
 

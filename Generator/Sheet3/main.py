@@ -8,6 +8,7 @@ Module: Function/Three
 """
 from __future__ import print_function
 # import general python modules
+from builtins import range
 import os
 import pandas as pd
 import numpy as np
@@ -81,7 +82,7 @@ def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, LAI_Product, NDM_Pro
 
     ############################# Download Data ###################################
     # Check the years that needs to be calculated
-    years = range(int(Startdate.split('-')[0]),int(Enddate.split('-')[0]) + 1)
+    years = list(range(int(Startdate.split('-')[0]),int(Enddate.split('-')[0]) + 1))
 
     # Find the maximum moving window value
     ET_Blue_Green_Classes_dict, Moving_Window_Per_Class_dict = GD.get_bluegreen_classes(version = '1.0')

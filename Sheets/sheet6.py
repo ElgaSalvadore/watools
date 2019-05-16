@@ -9,8 +9,7 @@ Module: Sheets/sheet6
 import os
 import pandas as pd
 import xml.etree.ElementTree as ET
-import subprocess
-import time
+import cairosvg
 
 def create_sheet6(basin, period, unit, data, output, template=False):
     """
@@ -138,18 +137,15 @@ def create_sheet6(basin, period, unit, data, output, template=False):
     xml_txt_box = tree1.findall('''.//*[@id='unit']''')[0]
     xml_txt_box.getchildren()[0].text = 'Sheet 6: Groundwater ({0})'.format(unit)
 
-    for key in p1.keys():
+    for key in list(p1.keys()):
         xml_txt_box = tree1.findall(".//*[@id='{0}']".format(key))[0]
         if not pd.isnull(p1[key]):
             xml_txt_box.getchildren()[0].text = '%.1f' % p1[key]
         else:
             xml_txt_box.getchildren()[0].text = '-'
-
-    ET.register_namespace("", "http://www.w3.org/2000/svg")
-
+    # Export svg to png
     tempout_path = output.replace('.png', '_temporary.svg')
     tree1.write(tempout_path)
 
-    subprocess.call(['C:\Program Files\Inkscape\inkscape.exe',tempout_path,'--export-png='+output, '-d 300'])
-    time.sleep(10)
+    cairosvg.svg2pdf(url=tempout_path, write_to=output)
     os.remove(tempout_path)

@@ -4,7 +4,10 @@ Created on Thu Mar 29 14:08:21 2018
 
 @author: tih
 """
+from __future__ import division
 
+from builtins import range
+from past.utils import old_div
 def run(input_nc, Inflow_Text_Files):
     '''
     This functions add inflow to the runoff dataset before the channel routing.
@@ -44,8 +47,8 @@ def run(input_nc, Inflow_Text_Files):
         Lat_coord = Coord[1]
 
         # Search for the pixel
-        lon_pix = int(np.ceil((float(Lon_coord) - geo_out[0])/geo_out[1]))
-        lat_pix = int(np.ceil((float(Lat_coord) - geo_out[3])/geo_out[5]))
+        lon_pix = int(np.ceil(old_div((float(Lon_coord) - geo_out[0]),geo_out[1])))
+        lat_pix = int(np.ceil(old_div((float(Lat_coord) - geo_out[3]),geo_out[5])))
 
         # Add the value on top of the Runoff array
         for i in range(1, len(Inlet)):
@@ -55,6 +58,6 @@ def run(input_nc, Inflow_Text_Files):
                 time_step_array = int(time_step[0][0])
                 value_m3_month = float(Inlet[i,1])
                 area_in_m2_pixel = area_in_m2[lat_pix, lon_pix]
-                value_mm = (value_m3_month/area_in_m2_pixel) * 1000
+                value_mm = (old_div(value_m3_month,area_in_m2_pixel)) * 1000
                 Runoff[time_step_array,lat_pix, lon_pix] = Runoff[time_step_array,lat_pix, lon_pix] + value_mm
     return(Runoff)

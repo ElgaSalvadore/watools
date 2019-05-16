@@ -4,6 +4,7 @@ Created on Fri Dec 16 19:04:22 2016
 
 @author: tih
 """
+from __future__ import print_function
 import pandas as pd
 import glob
 from osgeo import gdal, osr

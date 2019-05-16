@@ -24,7 +24,12 @@ SSEBop.monthly(Dir='C:/Temp/', Startdate='2003-02-24', Enddate='2003-03-09',
 
 """
 from __future__ import print_function
+from __future__ import division
 # General modules
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from past.utils import old_div
 import numpy as np
 import os
 import pandas as pd
@@ -33,7 +38,7 @@ import sys
 if sys.version_info[0] == 3:
     import urllib.parse
 if sys.version_info[0] == 2:
-    import urllib
+    import urllib.request, urllib.parse, urllib.error
 # Water Accounting Modules
 import watools.WebAccounts as WebAccounts
 import watools.General.raster_conversions as RC
@@ -166,7 +171,7 @@ def DownloadData(Dir, Startdate, Enddate, latlim, lonlim, Waitbar, version, Prod
                         
                 if Product == "ETpot":
                     Array_ETpot = RC.Open_bil_array(local_filename)
-                    Array_ETpot = Array_ETpot/100
+                    Array_ETpot = old_div(Array_ETpot,100)
                     Geo_out = tuple([-180.5, 1, 0, 90.5, 0, -1])
                     dest = DC.Save_as_MEM(Array_ETpot, Geo_out, "WGS84")
                     data, Geo_out = RC.clip_data(dest, latlim, lonlim)
@@ -249,7 +254,7 @@ def Download_SSEBop_from_Web(output_folder, Filename_only_zip, Product):
 
     # Download the data
     if sys.version_info[0] == 2:
-        urllib.urlretrieve(total_URL, os.path.join(output_folder, Filename_only_zip))
+        urllib.request.urlretrieve(total_URL, os.path.join(output_folder, Filename_only_zip))
     if sys.version_info[0] == 3:
         urllib.request.urlretrieve(total_URL, os.path.join(output_folder, Filename_only_zip)) 
 

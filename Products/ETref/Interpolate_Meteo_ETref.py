@@ -6,8 +6,10 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Products/ETref
 """
+from __future__ import division
 
 # import general python modules
+from past.utils import old_div
 import os
 import numpy as np
 
@@ -27,24 +29,24 @@ def process_GLDAS(Tmax, Tmin, humidity, surface_pressure):
     surface_pressure -- [] numpy array with the surface pressure
     """
 	# calculate the average temparature based on FAO
-    T_mean = (Tmax + Tmin) / 2
+    T_mean = old_div((Tmax + Tmin), 2)
 
 	# calculate the slope of saturation
-    delta = 4098 * (0.6108  * np.exp(17.27 * T_mean / (T_mean + 237.3))) / (T_mean + 237.3)**2
+    delta = old_div(4098 * (0.6108  * np.exp(17.27 * T_mean / (T_mean + 237.3))), (T_mean + 237.3)**2)
 
     # calculate the saturation vapour pressure by using the max and min temparature
     e0_max = 0.6108 * np.exp(17.27 * Tmax / (Tmax + 237.3))
     e0_min = 0.6108 * np.exp(17.27 * Tmin / (Tmin + 237.3))
 
     # calculate the saturated vapour pressure
-    es = (e0_max + e0_min) / 2
+    es = old_div((e0_max + e0_min), 2)
 
     # calculate the max and min relative humidity
-    RH_max = np.minimum((1/0.622) * humidity * surface_pressure / e0_min, 1)*100
-    RH_min = np.minimum((1/0.622) * humidity * surface_pressure / e0_max, 1)*100
+    RH_max = np.minimum(old_div((1/0.622) * humidity * surface_pressure, e0_min), 1)*100
+    RH_min = np.minimum(old_div((1/0.622) * humidity * surface_pressure, e0_max), 1)*100
 
     # calculate the actual vapour pressure
-    ea = (e0_min * RH_max/100 + e0_max * RH_min/100) / 2
+    ea = old_div((old_div(e0_min * RH_max,100) + old_div(e0_max * RH_min,100)), 2)
 
     return ea, es, delta
 
@@ -120,7 +122,7 @@ def adjust_P(Dir, pressure_map, DEMmap):
     demmap[demmap==-32768]=np.nan
 
     # calculate second part
-    P = P + (101.3*((293-0.0065*(demmap-dem_avg))/293)**5.26 - 101.3)
+    P = P + (101.3*(old_div((293-0.0065*(demmap-dem_avg)),293))**5.26 - 101.3)
 
     os.remove(DEM_ave_out_name)
 
@@ -146,8 +148,8 @@ def slope_correct(down_short_hor, pressure, ea, DEMmap, DOY):
     minx = GeoT[0]
     miny = GeoT[3] + xsize*GeoT[4] + ysize*GeoT[5]
 
-    x = np.flipud(np.arange(xsize)*GeoT[1] + minx + GeoT[1]/2)
-    y = np.flipud(np.arange(ysize)*-GeoT[5] + miny + -GeoT[5]/2)
+    x = np.flipud(np.arange(xsize)*GeoT[1] + minx + old_div(GeoT[1],2))
+    y = np.flipud(np.arange(ysize)*-GeoT[5] + miny + old_div(-GeoT[5],2))
 
     # Calculate Extraterrestrial Solar Radiation [W m-2]
     demmap = RC.Open_tiff_array(DEMmap)
@@ -160,7 +162,7 @@ def slope_correct(down_short_hor, pressure, ea, DEMmap, DOY):
     Rs_hor = down_short_hor
 
     # EQ 39
-    tau = Rs_hor/Ra_hor
+    tau = old_div(Rs_hor,Ra_hor)
 
     #EQ 41
     KB_hor = np.zeros(tau.shape) * np.nan
@@ -182,19 +184,19 @@ def slope_correct(down_short_hor, pressure, ea, DEMmap, DOY):
     #EQ 18
     W = 0.14*ea*pressure + 2.1
 
-    KB0 = 0.98*np.exp((-0.00146*pressure/Kt/sinb)-0.075*(W/sinb)**0.4)
-    KB0_hor = 0.98*np.exp((-0.00146*pressure/Kt/sinb_hor)-0.075*(W/sinb_hor)**0.4)
+    KB0 = 0.98*np.exp((old_div(-0.00146*pressure,Kt/sinb))-0.075*(old_div(W,sinb))**0.4)
+    KB0_hor = 0.98*np.exp((old_div(-0.00146*pressure,Kt/sinb_hor))-0.075*(old_div(W,sinb_hor))**0.4)
 
     #EQ 34
-    fB = KB0/KB0_hor * Ra_slp/Ra_hor
-    fia = (1-KB_hor) * (1 + (KB_hor/(KB_hor+KD_hor))**0.5 * np.sin(slope/2)**3)*fi + fB*KB_hor
+    fB = old_div(KB0,KB0_hor * Ra_slp/Ra_hor)
+    fia = (1-KB_hor) * (1 + (old_div(KB_hor,(KB_hor+KD_hor)))**0.5 * np.sin(old_div(slope,2))**3)*fi + fB*KB_hor
 
-    Rs = Rs_hor*(fB*(KB_hor/tau) + fia*(KD_hor/tau) + 0.23*(1-fi))
+    Rs = Rs_hor*(fB*(old_div(KB_hor,tau)) + fia*(old_div(KD_hor,tau)) + 0.23*(1-fi))
 
     Rs[np.isnan(Rs)] = Rs_hor[np.isnan(Rs)]
 
-    Rs_equiv = Rs / np.cos(slope)
+    Rs_equiv = old_div(Rs, np.cos(slope))
 
-    bias = np.nansum(Rs_hor)/np.nansum(Rs_equiv)
+    bias = old_div(np.nansum(Rs_hor),np.nansum(Rs_equiv))
 
     return Rs_equiv, tau, bias

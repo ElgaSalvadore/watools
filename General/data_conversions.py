@@ -4,6 +4,9 @@ Created on Sun Dec 18 13:07:32 2016
 
 @author: tih
 """
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 import gzip
 import zipfile
 import tarfile
@@ -33,7 +36,7 @@ def Convert_nc_to_tiff(input_nc, output_folder):
     elif type(input_nc) == list:
         nc = netCDF4.MFDataset(input_nc)
 
-    Var = nc.variables.keys()[-1]
+    Var = list(nc.variables.keys())[-1]
     All_Data = nc[Var]
 
     geo_out, epsg, size_X, size_Y, size_Z, Time = RC.Open_nc_info(input_nc)
@@ -369,9 +372,9 @@ def Save_as_NC(namenc, DataCube, Var, Reference_filename,  Startdate = '', Endda
         # Set the data variable
         if Startdate is not '':
             for i in range(len(Dates)):
-                preco[i,:,:] = DataCube[i,:,:]*1./np.float(Scaling_factor)
+                preco[i,:,:] = old_div(DataCube[i,:,:]*1.,np.float(Scaling_factor))
         else:
-            preco[:,:] = DataCube[:,:] * 1./np.float(Scaling_factor)
+            preco[:,:] = old_div(DataCube[:,:] * 1.,np.float(Scaling_factor))
 
         nco.close()
     return()
@@ -475,7 +478,7 @@ def Add_NC_Array_Variable(nc_outname, Array, name, unit, Scaling_factor = 1):
 
     # create input array
     Array[np.isnan(Array)] = -9999 * np.float(Scaling_factor)
-    Array = np.int_(Array * 1./np.float(Scaling_factor))
+    Array = np.int_(old_div(Array * 1.,np.float(Scaling_factor)))
 
     # Create NetCDF file
     nco = netCDF4.Dataset(nc_outname, 'r+', format = 'NETCDF4_CLASSIC')
@@ -505,7 +508,7 @@ def Add_NC_Array_Static(nc_outname, Array, name, unit, Scaling_factor = 1):
 
     # create input array
     Array[np.isnan(Array)] = -9999 * np.float(Scaling_factor)
-    Array = np.int_(Array * 1./np.float(Scaling_factor))
+    Array = np.int_(old_div(Array * 1.,np.float(Scaling_factor)))
 
     # Create NetCDF file
     nco = netCDF4.Dataset(nc_outname, 'r+', format = 'NETCDF4_CLASSIC')

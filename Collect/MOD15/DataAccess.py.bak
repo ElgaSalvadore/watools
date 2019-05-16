@@ -6,6 +6,7 @@ Contact: t.hessels@unesco-ihe.org
 Repository: https://github.com/wateraccounting/wa
 Module: Collect/MOD15
 """
+from __future__ import print_function
 
 # import general python modules
 import os
@@ -361,7 +362,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, nameDownload,
                                 nameDownload_url = full_url
                                 file_name = os.path.join(output_folder,nameDownload_url.split('/')[-1])
                                 if os.path.isfile(file_name):
-                                    print("file ", file_name, " already exists")
+                                    print(("file ", file_name, " already exists"))
                                     downloaded = 1
                                 else:
                                     x = requests.get(nameDownload_url, allow_redirects = False)

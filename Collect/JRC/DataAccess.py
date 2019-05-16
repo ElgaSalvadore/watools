@@ -7,8 +7,13 @@ Repository: https://github.com/wateraccounting/watools
 Module: Collect/JRC
 """
 from __future__ import print_function
+from __future__ import division
 
 # import general python modules
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from past.utils import old_div
 import os
 import numpy as np
 import shutil
@@ -113,9 +118,9 @@ def RetrieveData(args):
             latmerge = [lat_min_merge, lat_max_merge]
             data_one, geo_one = RC.clip_data(data_in, latmerge, lonmerge)
 
-            Ystart = int((geo_one[3] - latlim[1])/geo_one[5])
+            Ystart = int(old_div((geo_one[3] - latlim[1]),geo_one[5]))
             Yend = int(Ystart + np.shape(data_one)[0])
-            Xstart = int((geo_one[0] - lonlim[0])/geo_one[1])
+            Xstart = int(old_div((geo_one[0] - lonlim[0]),geo_one[1]))
             Xend = int(Xstart + np.shape(data_one)[1])
 
             data_end[Ystart:Yend, Xstart:Xend] = data_one
@@ -143,8 +148,8 @@ def Tiles_to_download(lonlim, latlim):
     lonmin = int(np.floor(lonlim[0]/10.)*10)
     lonmax = int(np.ceil(lonlim[1]/10.)*10)
 
-    lat_steps = range(latmin + 10 , latmax + 10 , 10)
-    lon_steps = range(lonmin, lonmax, 10)
+    lat_steps = list(range(latmin + 10 , latmax + 10 , 10))
+    lon_steps = list(range(lonmin, lonmax, 10))
 
     Names_to_download = []
 
@@ -177,7 +182,7 @@ def Collect_data(Names_to_download, output_folder):
     if sys.version_info[0] == 3:
         import urllib.parse
     if sys.version_info[0] == 2:
-        import urllib
+        import urllib.request, urllib.parse, urllib.error
 
     for Name_to_download in Names_to_download:
         output_Trash = os.path.join(output_folder, "Trash")
@@ -193,12 +198,12 @@ def Collect_data(Names_to_download, output_folder):
                if sys.version_info[0] == 3:
                    code = urllib.request.urlopen(url).getcode()                   
                if sys.version_info[0] == 2:                   
-                   code = urllib.urlopen(url).getcode()
+                   code = urllib.request.urlopen(url).getcode()
                if (code != 404):
                   if sys.version_info[0] == 3:
                       urllib.request.urlretrieve(url, filename)
                   if sys.version_info[0] == 2:    
-                      urllib.urlretrieve(url, filename)
+                      urllib.request.urlretrieve(url, filename)
                   times += 1
                   statinfo = os.stat(filename)
                   size = int(statinfo.st_size)

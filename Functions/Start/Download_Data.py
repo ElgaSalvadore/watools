@@ -432,7 +432,7 @@ def NPP(Dir, latlim, lonlim, Startdate, Enddate, Product = 'MOD17'):
         Path from the Dir to the downloaded data
 
     """
-    if Product is 'MOD17':
+    if Product == 'MOD17':
         from watools.Collect import MOD17
 
         # Define data path

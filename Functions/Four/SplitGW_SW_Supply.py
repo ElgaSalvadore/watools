@@ -43,7 +43,7 @@ def Fraction_Based(nc_outname, Startdate, Enddate):
 
     # Get Classes
     LU_Classes = Start.Get_Dictionaries.get_sheet5_classes()
-    LU_Classes_Keys = LU_Classes.keys()
+    LU_Classes_Keys = list(LU_Classes.keys())
 
     # Get fractions
     sw_supply_dict = Start.Get_Dictionaries.sw_supply_fractions()

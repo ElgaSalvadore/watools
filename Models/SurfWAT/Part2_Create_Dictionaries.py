@@ -5,6 +5,7 @@ Created on Mon Mar 12 15:45:45 2018
 @author: tih
 """
 from __future__ import print_function
+from builtins import range
 import numpy as np
 import watools.General.raster_conversions as RC
 

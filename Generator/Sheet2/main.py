@@ -7,6 +7,7 @@ Repository: https://github.com/wateraccounting/wa
 Module: Function/Two
 """
 
+from builtins import range
 def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, LAI_Product, NDM_Product, Startdate, Enddate, Simulation):
     """
     This functions is the main framework for calculating sheet 2.
@@ -59,7 +60,7 @@ def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, LAI_Product, NDM_Pro
     ############## Cut dates into pieces if it is needed ######################
 
     # Check the years that needs to be calculated
-    years = range(int(Startdate.split('-')[0]),int(Enddate.split('-')[0]) + 1)
+    years = list(range(int(Startdate.split('-')[0]),int(Enddate.split('-')[0]) + 1))
 
     for year in years:
 

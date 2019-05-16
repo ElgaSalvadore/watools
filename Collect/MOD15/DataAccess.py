@@ -9,6 +9,10 @@ Module: Collect/MOD15
 from __future__ import print_function
 
 # import general python modules
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 import os
 import numpy as np
 import pandas as pd
@@ -24,8 +28,8 @@ import sys
 if sys.version_info[0] == 3:
     import urllib.parse
 if sys.version_info[0] == 2:
-    import urlparse
-    import urllib2
+    import urllib.parse
+    import urllib.request, urllib.error, urllib.parse
 
 # Water Accounting modules
 import watools.General.raster_conversions as RC
@@ -191,7 +195,7 @@ def Make_TimeStamps(Startdate,Enddate):
     # If the startday is not in the same year as the enddate
     if AmountOfYear > 0:
         for i in range(0, AmountOfYear+1):
-            if i is 0:
+            if i == 0:
                 Startdate1 = Startdate
                 Enddate1 = YearEndDate[0]
                 Dates = pd.date_range(Startdate1, Enddate1, freq = '8D')
@@ -200,21 +204,21 @@ def Make_TimeStamps(Startdate,Enddate):
                 Enddate1 = Enddate
                 Dates1 = pd.date_range(Startdate1, Enddate1, freq = '8D')
                 Dates = Dates.union(Dates1)
-            if (i is not AmountOfYear and i is not 0):
+            if (i != AmountOfYear and i != 0):
                 Startdate1 = YearStartDate[i-AmountOfYear-1]
                 Enddate1 = YearEndDate[i]
                 Dates1 = pd.date_range(Startdate1, Enddate1, freq = '8D')
                 Dates = Dates.union(Dates1)
 
     # If the startday is in the same year as the enddate
-    if AmountOfYear is 0:
+    if AmountOfYear == 0:
         Dates = pd.date_range(Startdate, Enddate, freq = '8D')
 
     return(Dates)
 
 def Get_tiles_from_txt(output_folder, hdf_library, latlim, lonlim):
 
-    import urllib
+    import urllib.request, urllib.parse, urllib.error
 
     # Download list (txt file on the internet) which includes the lat and lon information of the MODIS tiles
     nameDownloadtext = 'https://modis-land.gsfc.nasa.gov/pdf/sn_gring_10deg.txt'
@@ -227,7 +231,7 @@ def Get_tiles_from_txt(output_folder, hdf_library, latlim, lonlim):
     if not os.path.exists(file_nametext):
         try:
             try:
-                urllib.urlretrieve(nameDownloadtext, file_nametext)
+                urllib.request.urlretrieve(nameDownloadtext, file_nametext)
             except:
                 data = urllib.request.urlopen(nameDownloadtext).read()
                 with open(file_nametext, "wb") as fp:
@@ -337,7 +341,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, nameDownload,
                     f = urllib.request.urlopen(url)
 
                 if sys.version_info[0] == 2:
-                    f = urllib2.urlopen(url)
+                    f = urllib.request.urlopen(url)
 
                 # Sum all the files on the server
                 soup = BeautifulSoup(f, "lxml")
@@ -353,7 +357,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, nameDownload,
                             full_url = urllib.parse.urljoin(url, i['href'])
 
                         if sys.version_info[0] == 2:
-                            full_url = urlparse.urljoin(url, i['href'])
+                            full_url = urllib.parse.urljoin(url, i['href'])
 
                         # if not downloaded try to download file
                         while downloaded == 0:
@@ -402,7 +406,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, nameDownload,
                     scale_factor = 0.1
                 dataset = gdal.Open(file_name)
                 sdsdict = dataset.GetMetadata('SUBDATASETS')
-                sdslist = [sdsdict[k] for k in sdsdict.keys() if '_%s_NAME' %dataset_nmbr in k]
+                sdslist = [sdsdict[k] for k in list(sdsdict.keys()) if '_%s_NAME' %dataset_nmbr in k]
                 sds = []
 
                 for n in sdslist:

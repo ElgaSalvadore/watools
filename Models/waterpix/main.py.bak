@@ -8,6 +8,7 @@ Module: waterpix
 """
 
 from __future__ import division
+from __future__ import print_function
 import datetime as dt
 from warnings import filterwarnings
 import pandas as pd
@@ -37,7 +38,7 @@ def run(input_nc, output_nc,
     '''
     # Read file and get lat, lon, and time data
     started = dt.datetime.now()
-    print 'Reading input netcdf ...'
+    print('Reading input netcdf ...')
     inp_nc = netCDF4.Dataset(input_nc, 'r')
     ncv = inp_nc.variables
     inp_crs = ncv['crs']
@@ -73,7 +74,7 @@ def run(input_nc, output_nc,
             raise Exception('The year {0} in the netcdf file is incomplete'
                             ' or the dates are non-consecutive')
     # Create ouput NetCDF
-    print 'Creating output netcdf ...'
+    print('Creating output netcdf ...')
     out_nc = netCDF4.Dataset(output_nc, 'w', format="NETCDF4")
     std_fv = -9999
     # Copy dimensions and variables (latitude, longitude, and time)
@@ -297,12 +298,12 @@ def run(input_nc, output_nc,
                                   fill_value=std_fv)
     b_var.long_name = 'b parameter in the eqn: perc = a*rdsm^b'
     # Pre-process first round
-    print 'Evapotranspiration separation (blue & green)'
+    print('Evapotranspiration separation (blue & green)')
     budyko_v = np.vectorize(budyko)
     inp_bas_vals = np.array(inp_basinb[:])
     # Year loop
     for yyyy in years_ls:
-        print '\tyear: {0}'.format(yyyy)
+        print('\tyear: {0}'.format(yyyy))
         yyyyi = years_ls.index(yyyy)
         ti1 = time_indeces[yyyy][0]
         ti2 = time_indeces[yyyy][-1] + 1
@@ -345,11 +346,11 @@ def run(input_nc, output_nc,
         # Store green pixels
         gpix_var[yyyyi, :, :] = gpix_array
     # First round
-    print 'FIRST ROUND'
-    print 'Running...'
+    print('FIRST ROUND')
+    print('Running...')
     # Year loop
     for yyyy in years_ls:
-        print '\tyear: {0}'.format(yyyy)
+        print('\tyear: {0}'.format(yyyy))
         yyyyi = years_ls.index(yyyy)
         ti1 = time_indeces[yyyy][0]
         ti2 = time_indeces[yyyy][-1] + 1
@@ -467,7 +468,7 @@ def run(input_nc, output_nc,
             else:
                 gpix_var[yyyyi, lati, loni] = std_fv
     # Pre-process second round
-    print 'Calculating infz and rdsm-perc fits'
+    print('Calculating infz and rdsm-perc fits')
     infz_array_all = np.zeros((years_n, lat_n, lon_n))
     infz_array_all[:] = np.nan
     perc_fit_parms_first_guess = (np.mean([perc_fit_parms_bounds[0][0],
@@ -475,7 +476,7 @@ def run(input_nc, output_nc,
                                   np.mean([perc_fit_parms_bounds[0][1],
                                            perc_fit_parms_bounds[1][1]]))
     for yyyy in years_ls:
-        print '\tyear: {0}'.format(yyyy)
+        print('\tyear: {0}'.format(yyyy))
         # Time indeces
         yyyyi = years_ls.index(yyyy)
         ti1 = time_indeces[yyyy][0]
@@ -524,11 +525,11 @@ def run(input_nc, output_nc,
                 infz_var[yyyyi, lati, loni] = infz_array_all[yyyyi,
                                                              lati, loni]
     # Second round
-    print 'SECOND ROUND'
-    print 'Running...'
+    print('SECOND ROUND')
+    print('Running...')
     # Year loop
     for yyyy in years_ls:
-        print '\tyear: {0}'.format(yyyy)
+        print('\tyear: {0}'.format(yyyy))
         # Time indeces
         yyyyi = years_ls.index(yyyy)
         ti1 = time_indeces[yyyy][0]
@@ -642,7 +643,7 @@ def run(input_nc, output_nc,
                 etgm_var[ti1:ti2,
                          lati, loni] = pd.np.array(df_out['et_green'])
     # Calculate yearly variables
-    print 'Calculating values per year...'
+    print('Calculating values per year...')
     for yyyy in years_ls:
         # Time indeces
         yyyyi = years_ls.index(yyyy)
@@ -664,9 +665,9 @@ def run(input_nc, output_nc,
         # Water use efficiency
         effiy_var[yyyyi, :, :] = np.nanmean(effi_var[ti1:ti2, :, :], axis=0)
     # Finishing
-    print 'Closing netcdf...'
+    print('Closing netcdf...')
     out_nc.close()
     ended = dt.datetime.now()
-    print 'Time elapsed: {0}'.format(ended - started)
+    print('Time elapsed: {0}'.format(ended - started))
     # Return noutput NetCDF file location
     return output_nc

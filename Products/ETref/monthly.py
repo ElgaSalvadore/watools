@@ -8,6 +8,7 @@ Module: Products/ETref
 '''
 from __future__ import print_function
 # import general python modules
+from builtins import str
 import sys
 import pandas as pd
 import numpy as np

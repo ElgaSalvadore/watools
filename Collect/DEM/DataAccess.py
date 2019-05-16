@@ -7,11 +7,17 @@ Repository: https://github.com/wateraccounting/watools
 Module: Collect/DEM
 """
 from __future__ import print_function
+from __future__ import division
 
 # General modules
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
+from past.utils import old_div
 import numpy as np
 import os
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import shutil
 import gdal
 import glob
@@ -157,10 +163,10 @@ def DownloadData(output_folder, latlim, lonlim, parameter, resolution):
                 Expected_X_min = Bound1
                 Expected_Y_max = Bound2 + 5
 
-                Xid_start = int(np.round((geo_out[0] - Expected_X_min)/geo_out[1]))
-                Xid_end = int(np.round(((geo_out[0] + size_X * geo_out[1]) - Expected_X_min)/geo_out[1]))
-                Yid_start = int(np.round((Expected_Y_max - geo_out[3])/(-geo_out[5])))
-                Yid_end = int(np.round((Expected_Y_max - (geo_out[3] + (size_Y * geo_out[5])))/(-geo_out[5])))
+                Xid_start = int(np.round(old_div((geo_out[0] - Expected_X_min),geo_out[1])))
+                Xid_end = int(np.round(old_div(((geo_out[0] + size_X * geo_out[1]) - Expected_X_min),geo_out[1])))
+                Yid_start = int(np.round(old_div((Expected_Y_max - geo_out[3]),(-geo_out[5]))))
+                Yid_end = int(np.round(old_div((Expected_Y_max - (geo_out[3] + (size_Y * geo_out[5]))),(-geo_out[5]))))
 
                 data[Yid_start:Yid_end,Xid_start:Xid_end] = RC.Open_tiff_array(output_tiff)
                 if np.max(data)==255:
@@ -245,8 +251,8 @@ def DownloadData(output_folder, latlim, lonlim, parameter, resolution):
         #size_X_end = int(size_X_tot) #!
         #size_Y_end = int(size_Y_tot) #!
 
-        size_X_end = int(size_X_tot/len(rangeLat)) + 1 #!
-        size_Y_end = int(size_Y_tot/len(rangeLon)) + 1 #!
+        size_X_end = int(old_div(size_X_tot,len(rangeLat))) + 1 #!
+        size_Y_end = int(old_div(size_Y_tot,len(rangeLon))) + 1 #!
 
         # Define the georeference of the end matrix
         geo_out = [Geo_x_end, Geo_data[1], 0, Geo_y_end, 0, Geo_data[5]]
@@ -296,8 +302,8 @@ def Merge_DEM_15s_30s(output_folder_trash,output_file_merged,latlim, lonlim, res
     if resolution == "30s":
         resolution_geo = 0.00416667 * 2
         
-    size_x_tot = int(np.round((lonmax-lonmin) / resolution_geo))
-    size_y_tot = int(np.round((latmax-latmin) / resolution_geo))
+    size_x_tot = int(np.round(old_div((lonmax-lonmin), resolution_geo)))
+    size_y_tot = int(np.round(old_div((latmax-latmin), resolution_geo)))
 
     data_tot = np.ones([size_y_tot,size_x_tot]) * -9999.
 
@@ -331,18 +337,18 @@ def Merge_DEM_15s_30s(output_folder_trash,output_file_merged,latlim, lonlim, res
         else:
            latmax_clip = latmax_one
 
-        size_x_clip = int(np.round((lonmax_clip-lonmin_clip) / resolution_geo))
-        size_y_clip = int(np.round((latmax_clip-latmin_clip) / resolution_geo))
+        size_x_clip = int(np.round(old_div((lonmax_clip-lonmin_clip), resolution_geo)))
+        size_y_clip = int(np.round(old_div((latmax_clip-latmin_clip), resolution_geo)))
 
         inFile=os.path.join(output_folder_trash,tiff_file)
         geo, proj, size_X, size_Y = RC.Open_array_info(inFile)
         Data = RC.Open_tiff_array(inFile)
         lonmin_tiff = geo[0]
         latmax_tiff = geo[3]
-        lon_tiff_position = int(np.round((lonmin_clip - lonmin_tiff)/ resolution_geo))
-        lat_tiff_position = int(np.round((latmax_tiff - latmax_clip)/ resolution_geo))
-        lon_data_tot_position = int(np.round((lonmin_clip - lonmin)/ resolution_geo))
-        lat_data_tot_position = int(np.round((latmax - latmax_clip)/ resolution_geo))
+        lon_tiff_position = int(np.round(old_div((lonmin_clip - lonmin_tiff), resolution_geo)))
+        lat_tiff_position = int(np.round(old_div((latmax_tiff - latmax_clip), resolution_geo)))
+        lon_data_tot_position = int(np.round(old_div((lonmin_clip - lonmin), resolution_geo)))
+        lat_data_tot_position = int(np.round(old_div((latmax - latmax_clip), resolution_geo)))
 
         Data[Data<-9999.] = -9999.
         data_tot[lat_data_tot_position:lat_data_tot_position+size_y_clip,lon_data_tot_position:lon_data_tot_position+size_x_clip][data_tot[lat_data_tot_position:lat_data_tot_position+size_y_clip,lon_data_tot_position:lon_data_tot_position+size_x_clip]==-9999]= Data[lat_tiff_position:lat_tiff_position+size_y_clip,lon_tiff_position:lon_tiff_position+size_x_clip][data_tot[lat_data_tot_position:lat_data_tot_position+size_y_clip,lon_data_tot_position:lon_data_tot_position+size_x_clip]==-9999]
@@ -374,10 +380,10 @@ def Merge_DEM(latlim, lonlim, nameResults, size_Y_tot, size_X_tot):
         dataset = np.array(f.GetRasterBand(1).ReadAsArray())
         dataset = np.flipud(dataset)
         geo_out = f.GetGeoTransform()
-        BoundChunk1 = int(round((geo_out[0]-lonlim[0])/geo_out[1]))
+        BoundChunk1 = int(round(old_div((geo_out[0]-lonlim[0]),geo_out[1])))
         BoundChunk2 = BoundChunk1 + int(dataset.shape[1])
-        BoundChunk4 = size_Y_tot + int(round((geo_out[3] -
-                                       latlim[1]) / geo_out[1]))
+        BoundChunk4 = size_Y_tot + int(round(old_div((geo_out[3] -
+                                       latlim[1]), geo_out[1])))
         BoundChunk3 = BoundChunk4 - int(dataset.shape[0])
         datasetTot[BoundChunk3:BoundChunk4, BoundChunk1:BoundChunk2] = dataset
         f = None
@@ -394,8 +400,8 @@ def Find_Document_Names(latlim, lonlim, parameter):
     lonlim -- [xmin, xmax] (values must be between -180 and 180)
     """
     # find tiles that must be downloaded
-    startLon = np.floor(lonlim[0] / 5) * 5
-    startLat = np.floor(latlim[0] / 5) * 5
+    startLon = np.floor(old_div(lonlim[0], 5)) * 5
+    startLat = np.floor(old_div(latlim[0], 5)) * 5
     endLon = np.ceil(lonlim[1] / 5.0) * 5
     endLat = np.ceil(latlim[1] / 5.0) * 5
     rangeLon = np.arange(startLon, endLon, 5)
@@ -450,7 +456,7 @@ def Download_Data(nameFile, output_folder_trash, parameter,para_name,resolution)
             if sys.version_info[0] == 3:
                 urllib.request.urlretrieve(url, output_file)
             if sys.version_info[0] == 2:
-                urllib.urlretrieve(url, output_file)
+                urllib.request.urlretrieve(url, output_file)
             size_data	= int(os.stat(output_file).st_size)
 
             if  size_data > 10000:
@@ -473,7 +479,7 @@ def Download_Data(nameFile, output_folder_trash, parameter,para_name,resolution)
                 if sys.version_info[0] == 3:
                     urllib.request.urlretrieve(url, output_file)
                 if sys.version_info[0] == 2:
-                    urllib.urlretrieve(url, output_file)
+                    urllib.request.urlretrieve(url, output_file)
 
                 if int(os.stat(output_file).st_size) > 10000:
                     break
@@ -499,7 +505,7 @@ def Find_Document_names_15s_30s(latlim, lonlim, parameter, resolution):
 
     return(continents_download)
 
-class DEM_15s_extents:
+class DEM_15s_extents(object):
         Continent = { 'na' : [-138, -52, 24, 60],
 					'ca' : [-119, -60, 5, 39],
                       'sa' : [-93, -32, -56, 15],
