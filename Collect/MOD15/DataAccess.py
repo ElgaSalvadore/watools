@@ -139,7 +139,6 @@ def RetrieveData(Date, args):
         Collect_data(TilesHorizontal, TilesVertical, Date, output_folder, nameDownload, hdf_library)
     except:
         print("Was not able to download the file")
-
     # Define the output name of the collect data function
     name_collect = os.path.join(output_folder, 'Merged.tif')
 
@@ -283,8 +282,8 @@ def Tiles_to_download(tiletext2,lonlim1,latlim1):
     TotalTiles = np.vstack([latlimtilesUL, latlimtilesLR])
 
     # Find the minimum horizontal and vertical tile value and the maximum horizontal and vertical tile value
-    TilesVertical = [TotalTiles[:,0].min(), TotalTiles[:,0].max()]
-    TilesHorizontal = [TotalTiles[:,1].min(), TotalTiles[:,1].max()]
+    TilesVertical = [int(TotalTiles[:,0].min()), int(TotalTiles[:,0].max())]
+    TilesHorizontal = [int(TotalTiles[:,1].min()), int(TotalTiles[:,1].max())]
     return(TilesVertical, TilesHorizontal)
 
 
@@ -306,7 +305,8 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, nameDownload,
 
     # Load accounts
     username, password = WebAccounts.Accounts(Type = 'NASA')
-
+    if (username, password) == ('', ''):
+        raise MissingCredentials('NASA')
     # Create the Lat and Long of the MODIS tile in meters
     for Vertical in range(int(TilesVertical[0]), int(TilesVertical[1])+1):
         Distance = 231.65635826395834*2 # resolution of a MODIS pixel in meter
@@ -466,3 +466,8 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, nameDownload,
     sds = None
     return()
 
+class MissingCredentials(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return 'Please enter credentials for {0} account in WebAccounts.py'.format(self.value)

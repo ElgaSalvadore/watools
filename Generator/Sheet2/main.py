@@ -8,7 +8,7 @@ Module: Function/Two
 """
 
 from builtins import range
-def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, LAI_Product, NDM_Product, Startdate, Enddate, Simulation):
+def Calculate(Dir_Home, Basin, LU_file_name, P_Product, ET_Product, LAI_Product, NDM_Product, Startdate, Enddate, Simulation):
     """
     This functions is the main framework for calculating sheet 2.
 
@@ -46,16 +46,9 @@ def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, LAI_Product, NDM_Pro
 
     ######################### Set General Parameters ##############################
 
-    # Get environmental variable for the Home folder
-    if WA_HOME_folder == '':
-        WA_env_paths = os.environ["WA_HOME"].split(';')
-        Dir_Home = WA_env_paths[0]
-    else:
-        Dir_Home = WA_HOME_folder
-
     # Get the boundaries of the basin based on the shapefile of the watershed
     # Boundaries, Shape_file_name_shp = Start.Boundaries.Determine(Basin)
-    Boundaries, Example_dataset = Start.Boundaries.Determine_LU_Based(Basin, Dir_Home)
+    Boundaries, Example_dataset = Start.Boundaries.Determine_LU_Based(LU_file_name, Dir_Home)
 
     ############## Cut dates into pieces if it is needed ######################
 

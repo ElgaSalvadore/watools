@@ -384,7 +384,7 @@ def LAI(Dir, latlim, lonlim, Startdate, Enddate, Product = 'MOD15'):
         Path from the Dir to the downloaded data
 
     """
-    if Product is 'MOD15':
+    if Product == 'MOD15':
         from watools.Collect import MOD15
 
         # Define data path

@@ -520,9 +520,9 @@ def reproject_modis_wgs84(dataset, method = 2):
     import watools.General.data_conversions as DC
     # MODIS Proj4 string
     proj4_str = "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=6371007.181 +b=6371007.181 +units=m +no_defs"
-    tsrs = osr.SpatialReference()
-    tsrs.ImportFromProj4(proj4_str)
-    s_wkt = tsrs.ExportToWkt()
+    ssrs = osr.SpatialReference()
+    ssrs.ImportFromProj4(proj4_str)
+    s_wkt = ssrs.ExportToWkt()
     pixel_spacing = .0039306
     # 1) Open the dataset
     g = gdal.Open(dataset)
@@ -541,14 +541,14 @@ def reproject_modis_wgs84(dataset, method = 2):
     x_size = g.RasterXSize  # Raster xsize
     y_size = g.RasterYSize  # Raster ysize
     epsg_to = 4326
-    epsg_to = int(epsg_to)
+#    epsg_to = int(epsg_to)
 
     # 2) Define the destination
     wgs84 = osr.SpatialReference()
     wgs84.ImportFromEPSG(epsg_to)
 
     inProj = Proj(proj4_str)
-    outProj = Proj(init='epsg:%d' %epsg_to)
+    outProj = Proj(init='epsg:{0}'.format(epsg_to))
     # Up to here, all  the projection have been defined, as well as a
     # transformation from the from to the to
     ulx, uly = transform(inProj,outProj,geo_t[0], geo_t[3])
@@ -581,19 +581,19 @@ def reproject_modis_wgs84(dataset, method = 2):
 
     # Set the geotransform
     dest.SetGeoTransform(new_geo)
-    dest.SetProjection(wgs84.ExportToWkt())
-    
+#    dest.SetProjection(wgs84.ExportToWkt())
+    gdal.Warp(dest,g,dstSRS='EPSG:4326')
     # Perform the projection/resampling
-    if method == 1:
-        gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(),gdal.GRA_NearestNeighbour)
-    if method == 2:
-        gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(),gdal.GRA_Bilinear)
-    if method == 3:
-        gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(), gdal.GRA_Lanczos)
-    if method == 4:
-        gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(), gdal.GRA_Average)
-    
-#    name_reprojected= ''.join(dataset.split(".")[:-1]) + '_reprojected2.tif'
+#    if method == 1:
+#        res = gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(),gdal.GRA_NearestNeighbour)
+#    if method == 2:
+#        res = gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(),gdal.GRA_Bilinear)
+#    if method == 3:
+#        res = gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(), gdal.GRA_Lanczos)
+#    if method == 4:
+#        res = gdal.ReprojectImage(g, dest, s_wkt, wgs84.ExportToWkt(), gdal.GRA_Average)
+#    assert res == 0, 'Error in ReprojectImage'
+#    name_reprojected= ''.join(dataset.split(".")[:-1]) + '_reprojected.tif'
 #    data1 = dest.GetRasterBand(1).ReadAsArray()
 #    geo1 = dest.GetGeoTransform()
 #    DC.Save_as_tiff(name=name_reprojected, data=data1, geo=geo1, projection='4326')

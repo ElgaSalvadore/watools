@@ -14,7 +14,7 @@ import pandas as pd
 import numpy as np
 import netCDF4
 
-def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, LAI_Product, NDM_Product, NDVI_Product, ETref_Product, dict_crops, dict_non_crops, Startdate, Enddate, Simulation):
+def Calculate(Dir_Home, Basin, LU_file_name, P_Product, ET_Product, LAI_Product, NDM_Product, NDVI_Product, ETref_Product, dict_crops, dict_non_crops, Startdate, Enddate, Simulation):
     """
     This functions is the main framework for calculating sheet 3.
 
@@ -63,13 +63,6 @@ def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, LAI_Product, NDM_Pro
         print("Calculation period is less than a year, which is not possible for sheet 3")
         quit
 
-    # Get environmental variable for the Home folder
-    if WA_HOME_folder == '':
-        WA_env_paths = os.environ["WA_HOME"].split(';')
-        Dir_Home = WA_env_paths[0]
-    else:
-        Dir_Home = WA_HOME_folder
-
     # Create the Basin folder
     Dir_Basin = os.path.join(Dir_Home, Basin)
     output_dir = os.path.join(Dir_Basin, "Simulations", "Simulation_%d" %Simulation)
@@ -78,7 +71,7 @@ def Calculate(WA_HOME_folder, Basin, P_Product, ET_Product, LAI_Product, NDM_Pro
 
     # Get the boundaries of the basin based on the shapefile of the watershed
     # Boundaries, Shape_file_name_shp = Start.Boundaries.Determine(Basin)
-    Boundaries, Example_dataset = Start.Boundaries.Determine_LU_Based(Basin, Dir_Home)
+    Boundaries, Example_dataset = Start.Boundaries.Determine_LU_Based(LU_file_name, Dir_Home)
 
     ############################# Download Data ###################################
     # Check the years that needs to be calculated
