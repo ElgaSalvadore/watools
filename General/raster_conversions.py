@@ -8,7 +8,6 @@ from __future__ import print_function
 from __future__ import division
 from builtins import str
 from builtins import range
-from past.utils import old_div
 import pandas as pd
 import glob
 from osgeo import gdal, osr
@@ -20,6 +19,8 @@ import subprocess
 from pyproj import Proj, transform
 import scipy.interpolate
 
+gdal.UseExceptions()
+
 def Run_command_window(argument):
     """
     This function runs the argument in the command window without showing cmd window
@@ -28,14 +29,15 @@ def Run_command_window(argument):
     argument -- string, name of the adf file
     """
     if os.name == 'posix':
-        argument = argument.replace(".exe","")
+        argument = argument.replace(".exe", "")
         os.system(argument)
 
     else:
         startupinfo = subprocess.STARTUPINFO()
         startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
-        process = subprocess.Popen(argument, startupinfo=startupinfo, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        process = subprocess.Popen(argument, startupinfo=startupinfo,
+                                   stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         process.wait()
 
     return()
@@ -74,12 +76,12 @@ def Open_tiff_array(filename='', band=''):
     if f is None:
         print('%s does not exists' %filename)
     else:
-        if band is '':
+        if band == '':
             band = 1
         Data = f.GetRasterBand(band).ReadAsArray()
-    return(Data)
+    return Data
 
-def Open_nc_info(NC_filename, Var = None):
+def Open_nc_info(NC_filename, Var=None):
     """
     Opening a nc info, for example size of array, time (ordinal), projection and transform matrix.
 
@@ -109,18 +111,18 @@ def Open_nc_info(NC_filename, Var = None):
 
     Geo6 = fh.variables['latitude'].pixel_size
     Geo2 = fh.variables['longitude'].pixel_size
-    Geo4 = np.max(lats) + old_div(Geo6,2)
-    Geo1 = np.min(lons) - old_div(Geo2,2)
+    Geo4 = np.max(lats) + Geo6/ 2
+    Geo1 = np.min(lons) - Geo2/ 2
 
     crso = fh.variables['crs']
     proj = crso.projection
-    epsg = Get_epsg(proj, extension = 'GEOGCS')
+    epsg = Get_epsg(proj, extension='GEOGCS')
     geo_out = tuple([Geo1, Geo2, 0, Geo4, 0, Geo6])
     fh.close()
 
     return(geo_out, epsg, size_X, size_Y, size_Z, Time)
 
-def Open_nc_array(NC_filename, Var = None, Startdate = '', Enddate = ''):
+def Open_nc_array(NC_filename, Var=None, Startdate='', Enddate=''):
     """
     Opening a nc array.
 
@@ -140,7 +142,7 @@ def Open_nc_array(NC_filename, Var = None, Startdate = '', Enddate = ''):
     if Var == None:
         Var = list(fh.variables.keys())[-1]
 
-    if Startdate is not '':
+    if Startdate != '':
         Time = fh.variables['time'][:]
         Array_check_start = np.ones(np.shape(Time))
         Date = pd.Timestamp(Startdate)
@@ -150,7 +152,7 @@ def Open_nc_array(NC_filename, Var = None, Startdate = '', Enddate = ''):
     else:
         Start = 0
 
-    if Enddate is not '':
+    if Enddate != '':
         Time = fh.variables['time'][:]
         Array_check_end = np.zeros(np.shape(Time))
         Date = pd.Timestamp(Enddate)
@@ -164,7 +166,7 @@ def Open_nc_array(NC_filename, Var = None, Startdate = '', Enddate = ''):
         except:
             End = ''
 
-    if (Enddate is not '' or Startdate is not ''):
+    if (Enddate != '' or Startdate != ''):
         Data = fh.variables[Var][int(Start):int(End), :, :]
 
     else:
@@ -179,7 +181,7 @@ def Open_nc_array(NC_filename, Var = None, Startdate = '', Enddate = ''):
 
     return(Data)
 
-def Open_bil_array(bil_filename, band = 1):
+def Open_bil_array(bil_filename, band=1):
     """
     Opening a bil array.
 
@@ -192,8 +194,8 @@ def Open_bil_array(bil_filename, band = 1):
     gdal.GetDriverByName('EHdr').Register()
     img = gdal.Open(bil_filename)
     Data = img.GetRasterBand(band).ReadAsArray()
-    
-    return(Data)
+
+    return Data
 
 def Open_ncs_array(NC_Directory, Var, Startdate, Enddate):
     """
@@ -234,13 +236,13 @@ def Open_ncs_array(NC_Directory, Var, Startdate, Enddate):
         if year == years[0]:
             Data_end = Data_now
         else:
-            Data_end = np.vstack([Data_end,Data_now])
+            Data_end = np.vstack([Data_end, Data_now])
 
     Data_end = np.array(Data_end)
 
-    return(Data_end)
+    return Data_end
 
-def Open_nc_dict(input_netcdf, group_name, startdate = '', enddate = ''):
+def Open_nc_dict(input_netcdf, group_name, startdate='', enddate=''):
     """
     Opening a nc dictionary.
 
@@ -262,7 +264,7 @@ def Open_nc_dict(input_netcdf, group_name, startdate = '', enddate = ''):
 
     # if it is dynamic also collect the time parameter
     if kind_of_data == 'dynamic':
-        time_dates = Open_nc_array(input_netcdf, Var = 'time')
+        time_dates = Open_nc_array(input_netcdf, Var='time')
         Amount_months = len(time_dates)
 
     # Open the input netcdf and the wanted group name
@@ -272,30 +274,30 @@ def Open_nc_dict(input_netcdf, group_name, startdate = '', enddate = ''):
     # Convert the string into a string that can be retransformed into a dictionary
     string_dict = str(data)
     split_dict = str(string_dict.split('\n')[2:-4])
-    split_dict = split_dict.replace("'","")
+    split_dict = split_dict.replace("'", "")
     split_dict = split_dict[1:-1]
     dictionary = dict()
-    split_dict_split = re.split(':|,  ',split_dict)
+    split_dict_split = re.split(':|,  ', split_dict)
 
     # Loop over every attribute and add the array
-    for i in range(0,len(split_dict_split)):
+    for i in range(0, len(split_dict_split)):
         number_val = split_dict_split[i]
         if i % 2 == 0:
-            Array_text = split_dict_split[i + 1].replace(",","")
-            Array_text = Array_text.replace("[","")
-            Array_text = Array_text.replace("]","")
+            Array_text = split_dict_split[i + 1].replace(",", "")
+            Array_text = Array_text.replace("[", "")
+            Array_text = Array_text.replace("]", "")
             # If the array is dynamic add a 2D array
             if kind_of_data == 'dynamic':
-                tot_length = len(np.fromstring(Array_text,sep = ' '))
-                dictionary[int(number_val)] = np.fromstring(Array_text,sep = ' ').reshape((int(Amount_months), int(old_div(tot_length,Amount_months))))
+                tot_length = len(np.fromstring(Array_text, sep=' '))
+                dictionary[int(number_val)] = np.fromstring(Array_text,sep=' ').reshape((int(Amount_months), int(tot_length/ Amount_months)))
             # If the array is static add a 1D array
             else:
-                dictionary[int(number_val)] = np.fromstring(Array_text,sep = ' ')
+                dictionary[int(number_val)] = np.fromstring(Array_text, sep=' ')
 
     # Clip the dynamic dataset if a start and enddate is defined
     if kind_of_data == 'dynamic':
 
-        if startdate is not '':
+        if startdate != '':
             Array_check_start = np.ones(np.shape(time_dates))
             Date = pd.Timestamp(startdate)
             Startdate_ord = Date.toordinal()
@@ -304,7 +306,7 @@ def Open_nc_dict(input_netcdf, group_name, startdate = '', enddate = ''):
         else:
             Start = 0
 
-        if enddate is not '':
+        if enddate != '':
             Array_check_end = np.zeros(np.shape(time_dates))
             Date = pd.Timestamp(enddate)
             Enddate_ord = Date.toordinal()
@@ -324,12 +326,12 @@ def Open_nc_dict(input_netcdf, group_name, startdate = '', enddate = ''):
 
             for key in dictionary.keys():
 
-                Array = dictionary[key][:,:]
-                Array_new = Array[int(Start):int(End),:]
+                Array = dictionary[key][:, :]
+                Array_new = Array[int(Start):int(End), :]
                 dictionary[key] = Array_new
     in_nc.close()
 
-    return(dictionary)
+    return dictionary
 
 #def Clip_Dataset_GDAL(input_name, output_name, latlim, lonlim):
 #    """
@@ -352,7 +354,7 @@ def Open_nc_dict(input_netcdf, group_name, startdate = '', enddate = ''):
 #
 #    return()
 
-def clip_data(input_file, latlim, lonlim, output_name = None):
+def clip_data(input_file, latlim, lonlim, output_name=None):
     """
     Clip the data to the defined extend of the user (latlim, lonlim) or to the
     extend of the DEM tile
@@ -376,12 +378,12 @@ def clip_data(input_file, latlim, lonlim, output_name = None):
     # Define the array that must remain
     Geo_in = dest_in.GetGeoTransform()
     Geo_in = list(Geo_in)
-    Start_x = np.max([int(np.floor(old_div(((lonlim[0]) - Geo_in[0]), Geo_in[1]))),0])
-    End_x = np.min([int(np.ceil(old_div(((lonlim[1]) - Geo_in[0]), Geo_in[1]))),int(dest_in.RasterXSize)])
-
-    Start_y = np.max([int(np.floor(old_div((Geo_in[3] - latlim[1]), -Geo_in[5]))),0])
-    End_y = np.min([int(np.ceil(old_div(((latlim[0]) - Geo_in[3]),Geo_in[5]))), int(dest_in.RasterYSize)])
-
+    Start_x = np.max([int(np.floor(((lonlim[0]) - Geo_in[0])/ Geo_in[1])), 0])
+    End_x = np.min([int(np.ceil(((lonlim[1]) - Geo_in[0])/Geo_in[1])),
+                    int(dest_in.RasterXSize)])
+    Start_y = np.max([int(np.floor((Geo_in[3] - latlim[1])/ -Geo_in[5])), 0])
+    End_y = np.min([int(np.ceil(((latlim[0]) - Geo_in[3])/Geo_in[5])),
+                    int(dest_in.RasterYSize)])
     #Create new GeoTransform
     Geo_in[0] = Geo_in[0] + Start_x * Geo_in[1]
     Geo_in[3] = Geo_in[3] + Start_y * Geo_in[5]
@@ -389,11 +391,11 @@ def clip_data(input_file, latlim, lonlim, output_name = None):
 
     data = np.zeros([End_y - Start_y, End_x - Start_x])
 
-    data = data_in[Start_y:End_y,Start_x:End_x]
-    
-    
+    data = data_in[Start_y:End_y, Start_x:End_x]
+
     if output_name:
-        DC.Save_as_tiff(name=output_name, data=data, geo=Geo_out, projection=dest_in.GetProjection())
+        DC.Save_as_tiff(name=output_name, data=data, geo=Geo_out,
+                        projection=dest_in.GetProjection())
     dest_in = None
     return (data, Geo_out)
 
@@ -424,8 +426,6 @@ def reproject_dataset_epsg(dataset, pixel_spacing, epsg_to, method = 2):
 
     # 1) Open the dataset
     g = gdal.Open(dataset)
-    if g is None:
-        print('input folder does not exist')
 
     # Get EPSG code
     epsg_from = Get_epsg(g)
@@ -454,9 +454,9 @@ def reproject_dataset_epsg(dataset, pixel_spacing, epsg_to, method = 2):
 
     # Up to here, all  the projection have been defined, as well as a
     # transformation from the from to the to
-    ulx, uly = transform(inProj,outProj,geo_t[0], geo_t[3])
-    lrx, lry = transform(inProj,outProj,geo_t[0] + geo_t[1] * x_size,
-                                        geo_t[3] + geo_t[5] * y_size)
+    ulx, uly = transform(inProj, outProj, geo_t[0], geo_t[3])
+    lrx, lry = transform(inProj, outProj, geo_t[0] + geo_t[1] * x_size,
+                         geo_t[3] + geo_t[5] * y_size)
 
     # See how using 27700 and WGS84 introduces a z-value!
     # Now, we create an in-memory raster
@@ -465,8 +465,8 @@ def reproject_dataset_epsg(dataset, pixel_spacing, epsg_to, method = 2):
     # The size of the raster is given the new projection and pixel spacing
     # Using the values we calculated above. Also, setting it to store one band
     # and to use Float32 data type.
-    col = int(old_div((lrx - ulx),pixel_spacing))
-    rows = int(old_div((uly - lry),pixel_spacing))
+    col = int((lrx - ulx)/ pixel_spacing)
+    rows = int((uly - lry)/ pixel_spacing)
 
     # Re-define lr coordinates based on whole number or rows and columns
     (lrx, lry) = (ulx + col * pixel_spacing, uly -
@@ -486,13 +486,17 @@ def reproject_dataset_epsg(dataset, pixel_spacing, epsg_to, method = 2):
 
     # Perform the projection/resampling
     if method == 1:
-        gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(),gdal.GRA_NearestNeighbour)
+        gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(),
+                            gdal.GRA_NearestNeighbour)
     if method == 2:
-        gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(),gdal.GRA_Bilinear)
+        gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(),
+                            gdal.GRA_Bilinear)
     if method == 3:
-        gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(), gdal.GRA_Lanczos)
+        gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(),
+                            gdal.GRA_Lanczos)
     if method == 4:
-        gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(), gdal.GRA_Average)
+        gdal.ReprojectImage(g, dest, wgs84.ExportToWkt(), osng.ExportToWkt(),
+                            gdal.GRA_Average)
     return dest, ulx, lry, lrx, uly, epsg_to
 
 def reproject_modis_wgs84(dataset, method = 2):
@@ -562,8 +566,8 @@ def reproject_modis_wgs84(dataset, method = 2):
     # The size of the raster is given the new projection and pixel spacing
     # Using the values we calculated above. Also, setting it to store one band
     # and to use Float32 data type.
-    col = int(old_div((lrx - ulx),pixel_spacing))
-    rows = int(old_div((uly - lry),pixel_spacing))
+    col = int((lrx - ulx)/ pixel_spacing)
+    rows = int((uly - lry)/ pixel_spacing)
 
     # Re-define lr coordinates based on whole number or rows and columns
     (lrx, lry) = (ulx + col * pixel_spacing, uly -
@@ -646,7 +650,7 @@ def reproject_dataset_example(dataset, dataset_example, method=1):
         else:
             g = dataset
     except:
-            g = dataset
+        g = dataset
     epsg_from = Get_epsg(g)
 
     #exceptions
@@ -667,8 +671,8 @@ def reproject_dataset_example(dataset, dataset_example, method=1):
             gland = dataset_example
             epsg_to = Get_epsg(gland)
     except:
-            gland = dataset_example
-            epsg_to = Get_epsg(gland)
+        gland = dataset_example
+        epsg_to = Get_epsg(gland)
 
     # Set the EPSG codes
     osng = osr.SpatialReference()
@@ -688,15 +692,19 @@ def reproject_dataset_example(dataset, dataset_example, method=1):
     dest1.SetProjection(osng.ExportToWkt())
 
     # Perform the projection/resampling
-    if method is 1:
-        gdal.ReprojectImage(g, dest1, wgs84.ExportToWkt(), osng.ExportToWkt(), gdal.GRA_NearestNeighbour)
-    if method is 2:
-        gdal.ReprojectImage(g, dest1, wgs84.ExportToWkt(), osng.ExportToWkt(), gdal.GRA_Bilinear)
-    if method is 3:
-        gdal.ReprojectImage(g, dest1, wgs84.ExportToWkt(), osng.ExportToWkt(), gdal.GRA_Lanczos)
-    if method is 4:
-        gdal.ReprojectImage(g, dest1, wgs84.ExportToWkt(), osng.ExportToWkt(), gdal.GRA_Average)
-    return(dest1)
+    if method == 1:
+        gdal.ReprojectImage(g, dest1, wgs84.ExportToWkt(), osng.ExportToWkt(),
+                            gdal.GRA_NearestNeighbour)
+    if method == 2:
+        gdal.ReprojectImage(g, dest1, wgs84.ExportToWkt(), osng.ExportToWkt(),
+                            gdal.GRA_Bilinear)
+    if method == 3:
+        gdal.ReprojectImage(g, dest1, wgs84.ExportToWkt(), osng.ExportToWkt(),
+                            gdal.GRA_Lanczos)
+    if method == 4:
+        gdal.ReprojectImage(g, dest1, wgs84.ExportToWkt(), osng.ExportToWkt(),
+                            gdal.GRA_Average)
+    return dest1
 
 def resize_array_example(Array_in, Array_example, method=1):
     """
@@ -740,10 +748,12 @@ def resize_array_example(Array_in, Array_example, method=1):
 
             if sys.version_info[0] == 2:
                 import scipy.misc as misc
-                Array_out_slice= misc.imresize(np.float_(Array_in_slice), size, interp=interpolation_method, mode='F')
+                Array_out_slice= misc.imresize(np.float_(Array_in_slice), size,
+                                               interp=interpolation_method, mode='F')
             if sys.version_info[0] == 3:
                 import skimage.transform as transform
-                Array_out_slice= transform.resize(np.float_(Array_in_slice), size, order=interpolation_number)
+                Array_out_slice= transform.resize(np.float_(Array_in_slice),
+                                                  size, order=interpolation_number)
                 
             Array_out[i,:,:] = Array_out_slice
 
@@ -752,17 +762,17 @@ def resize_array_example(Array_in, Array_example, method=1):
         size=tuple(Array_out_shape)
         if sys.version_info[0] == 2:
             import scipy.misc as misc
-            Array_out= misc.imresize(np.float_(Array_in), size, interp=interpolation_method, mode='F')
+            Array_out= misc.imresize(np.float_(Array_in), size,
+                                     interp=interpolation_method, mode='F')
         if sys.version_info[0] == 3:
             import skimage.transform as transform
-            Array_out= transform.resize(np.float_(Array_in), size, order=interpolation_number)
-      
+            Array_out= transform.resize(np.float_(Array_in), size,
+                                        order=interpolation_number)    
     else:
         print('only 2D or 3D dimensions are supported')
-
     return(Array_out)
 
-def Get_epsg(g, extension = 'tiff'):
+def Get_epsg(g, extension='tiff'):
     """
     This function reads the projection of a GEOGCS file or tiff file
 
@@ -781,11 +791,11 @@ def Get_epsg(g, extension = 'tiff'):
             Projection = g
         epsg_to=int((str(Projection[-1]).split(']')[0])[0:-1])
     except:
-       epsg_to=4326
+        epsg_to=4326
        #print 'Was not able to get the projection, so WGS84 is assumed'
     return(epsg_to)
 
-def gap_filling(dataset,NoDataValue, method = 1):
+def gap_filling(dataset, NoDataValue, method=1):
     """
     This function fills the no data gaps in a numpy array
 
@@ -838,7 +848,7 @@ def gap_filling(dataset,NoDataValue, method = 1):
 
     return (EndProduct)
 
-def Get3Darray_time_series_monthly(Data_Path, Startdate, Enddate, Example_data = None):
+def Get3Darray_time_series_monthly(Data_Path, Startdate, Enddate, Example_data=None):
     """
     This function creates a datacube
 
@@ -854,7 +864,7 @@ def Get3Darray_time_series_monthly(Data_Path, Startdate, Enddate, Example_data =
     """
 
     # Get a list of dates that needs to be reprojected
-    Dates = pd.date_range(Startdate, Enddate, freq = 'MS')
+    Dates = pd.date_range(Startdate, Enddate, freq='MS')
 
     # Change Working directory
     os.chdir(Data_Path)
@@ -918,8 +928,8 @@ def Get3Darray_time_series_monthly(Data_Path, Startdate, Enddate, Example_data =
 
             # Get the properties from the first file
             if Date is Dates[0]:
-                    geo_out, proj, size_X, size_Y = Open_array_info(file_name_path)
-                    dataTot=np.zeros([len(Dates),size_Y,size_X])
+                geo_out, proj, size_X, size_Y = Open_array_info(file_name_path)
+                dataTot=np.zeros([len(Dates),size_Y,size_X])
             Array_one_date = Open_tiff_array(file_name_path)
 
         # Create the 3D array
@@ -941,7 +951,7 @@ def Vector_to_Raster(Dir, shapefile_name, reference_raster_data_name):
         str: Path to an example tiff file (all arrays will be reprojected to this example)
     """
 
-    from osgeo import gdal, ogr
+    from osgeo import ogr
 
     geo, proj, size_X, size_Y=Open_array_info(reference_raster_data_name)
 
@@ -964,8 +974,8 @@ def Vector_to_Raster(Dir, shapefile_name, reference_raster_data_name):
     source_layer = source_ds.GetLayer()
 
     # Create the destination data source
-    x_res = int(round(old_div((x_max - x_min), pixel_size)))
-    y_res = int(round(old_div((y_max - y_min), pixel_size)))
+    x_res = int(round((x_max - x_min)/ pixel_size))
+    y_res = int(round((y_max - y_min)/ pixel_size))
 
     # Create tiff file
     target_ds = gdal.GetDriverByName('GTiff').Create(Dir_Raster_end, x_res, y_res, 1, gdal.GDT_Float32, ['COMPRESS=LZW'])
@@ -1026,35 +1036,26 @@ def Get_ordinal(Startdate, Enddate, freq = 'MS'):
     return(ordinal)
 
 def Create_Buffer(Data_In, Buffer_area):
-
-   '''
-   This function creates a 3D array which is used to apply the moving window
-   '''
-
+    '''
+    This function creates a 3D array which is used to apply the moving window
+    '''
    # Buffer_area = 2 # A block of 2 times Buffer_area + 1 will be 1 if there is the pixel in the middle is 1
-   Data_Out=np.empty((len(Data_In),len(Data_In[1])))
-   Data_Out[:,:] = Data_In
-   for ypixel in range(0,Buffer_area + 1):
-
-        for xpixel in range(1,Buffer_area + 1):
-
-           if ypixel==0:
+    Data_Out=np.empty((len(Data_In), len(Data_In[1])))
+    Data_Out[:,:] = Data_In
+    for ypixel in range(0, Buffer_area + 1):
+        for xpixel in range(1, Buffer_area + 1):
+            if ypixel==0:
                 for xpixel in range(1,Buffer_area + 1):
-                    Data_Out[:,0:-xpixel] += Data_In[:,xpixel:]
-                    Data_Out[:,xpixel:] += Data_In[:,:-xpixel]
-
+                    Data_Out[:, 0:-xpixel] += Data_In[:, xpixel:]
+                    Data_Out[:, xpixel:] += Data_In[:, :-xpixel]
                 for ypixel in range(1,Buffer_area + 1):
-
-                    Data_Out[ypixel:,:] += Data_In[:-ypixel,:]
-                    Data_Out[0:-ypixel,:] += Data_In[ypixel:,:]
-
-           else:
-               Data_Out[0:-xpixel,ypixel:] += Data_In[xpixel:,:-ypixel]
-               Data_Out[xpixel:,ypixel:] += Data_In[:-xpixel,:-ypixel]
-               Data_Out[0:-xpixel,0:-ypixel] += Data_In[xpixel:,ypixel:]
-               Data_Out[xpixel:,0:-ypixel] += Data_In[:-xpixel,ypixel:]
-
-   Data_Out[Data_Out>0.1] = 1
-   Data_Out[Data_Out<=0.1] = 0
-
-   return(Data_Out)
+                    Data_Out[ypixel:, :] += Data_In[:-ypixel, :]
+                    Data_Out[0:-ypixel, :] += Data_In[ypixel:, :]
+            else:
+                Data_Out[0:-xpixel, ypixel:] += Data_In[xpixel:, :-ypixel]
+                Data_Out[xpixel:, ypixel:] += Data_In[:-xpixel, :-ypixel]
+                Data_Out[0:-xpixel, 0:-ypixel] += Data_In[xpixel:, ypixel:]
+                Data_Out[xpixel:, 0:-ypixel] += Data_In[:-xpixel, ypixel:]
+    Data_Out[Data_Out>0.1] = 1
+    Data_Out[Data_Out<=0.1] = 0
+    return Data_Out 

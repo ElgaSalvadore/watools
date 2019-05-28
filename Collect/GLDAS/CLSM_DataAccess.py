@@ -6,7 +6,6 @@ from __future__ import division
 from builtins import str
 from builtins import range
 from builtins import object
-from past.utils import old_div
 import numpy as np
 import calendar
 import os
@@ -233,7 +232,7 @@ def RetrieveData_three_hourly(Date, args):
                     else:
                         data = data * VarFactor
                     if VarInfo.types[Var] == 'flux':
-                        data = old_div(data, 8)
+                        data = data / 8
 
                     # Set Nan value for values lower than -9999
                     data[data < -9999] = -9999

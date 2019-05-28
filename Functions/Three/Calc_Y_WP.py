@@ -9,7 +9,6 @@ Module: Function/Three
 from __future__ import print_function
 from __future__ import division
 from builtins import zip
-from past.utils import old_div
 import csv
 import numpy as np
 import calendar
@@ -145,8 +144,8 @@ def Season(startdate, enddate, dir_nc_outname, lu_class, croptype, ab = (1.0,0.9
         start_month_length = float(calendar.monthrange(startdate.year, startdate.month)[1])
         end_month_length = float(calendar.monthrange(enddate.year, enddate.month)[1])
 
-        fractions[0] = old_div((start_month_length - startdate.day + 1), start_month_length)
-        fractions[-1] = old_div((enddate.day -1), end_month_length)
+        fractions[0] = (start_month_length - startdate.day + 1)/start_month_length
+        fractions[-1] = (enddate.day -1)/end_month_length
 
         # Get total sum NDM over the growing season
         NDM_array = RC.Open_ncs_array(dir_nc_outname, "Normalized_Dry_Matter", startdate.replace(day=1), enddate)
@@ -176,11 +175,11 @@ def Season(startdate, enddate, dir_nc_outname, lu_class, croptype, ab = (1.0,0.9
         NDM[LULC != lu_class] = ETblue[LULC != lu_class] = ETgreen[LULC != lu_class] =  np.nan
 
         # Calculate Yield
-        Y_Array = old_div((harvest_index * NDM), (1 - moisture_content))
+        Y_Array = (harvest_index * NDM) / (1 - moisture_content)
 
         # Calculate fractions of ETblue and green and blue Yield
-        ETblue_fraction = old_div(ETblue, (ETblue + ETgreen))
-        p_fraction = old_div(P, np.nanmax(P))
+        ETblue_fraction = ETblue / (ETblue + ETgreen)
+        p_fraction = P / np.nanmax(P)
         fraction = Three.SplitYield.P_ET_based(p_fraction, ETblue_fraction, ab[0], ab[1])
 
         # Calculate yield from irrigation and precipitation
@@ -222,18 +221,18 @@ def Season(startdate, enddate, dir_nc_outname, lu_class, croptype, ab = (1.0,0.9
 
         # Calculate the total area in km2
         areas_m2[LULC != lu_class] = np.nan
-        areas_km2 = old_div(areas_m2,1000**2)
+        areas_km2 = areas_m2 / 1000**2
         print('{0}: {1} km2'.format(croptype, np.nansum(areas_km2)))
 
         # Calculate the Water consumpution in km3
-        WCblue_Ave_Value = np.nansum(old_div(ETblue_Ave_Value,1000**2 * areas_km2))
-        WCgreen_Ave_Value = np.nansum(old_div(ETgreen_Ave_Value,1000**2 * areas_km2))
+        WCblue_Ave_Value = np.nansum(ETblue_Ave_Value/(1000**2) * areas_km2)
+        WCgreen_Ave_Value = np.nansum(ETgreen_Ave_Value/(1000**2) * areas_km2)
         WC_Ave_Value = WCblue_Ave_Value + WCgreen_Ave_Value
 
         # Calculate water productivity
-        WP_Ave_Value = old_div(Yield_Ave_Value, ((ETblue_Ave_Value + ETgreen_Ave_Value) * 10))
-        WPblue_Ave_Value = np.where(ETblue_Ave_Value == 0, [np.nan], [old_div(Yield_irr_Ave_Value, (ETblue_Ave_Value * 10))])[0]
-        WPgreen_Ave_Value = np.where(ETgreen_Ave_Value == 0, [np.nan], [old_div(Yield_pr_Ave_Value, (ETgreen_Ave_Value * 10))])[0]
+        WP_Ave_Value = Yield_Ave_Value/ ((ETblue_Ave_Value + ETgreen_Ave_Value) * 10)
+        WPblue_Ave_Value = np.where(ETblue_Ave_Value == 0, [np.nan], [Yield_irr_Ave_Value/ (ETblue_Ave_Value * 10)])[0]
+        WPgreen_Ave_Value = np.where(ETgreen_Ave_Value == 0, [np.nan], [Yield_pr_Ave_Value/ (ETgreen_Ave_Value * 10)])[0]
 
     return Yield_Ave_Value, Yield_pr_Ave_Value, Yield_irr_Ave_Value, WP_Ave_Value, WPblue_Ave_Value, WPgreen_Ave_Value, WC_Ave_Value, WCblue_Ave_Value, WCgreen_Ave_Value
 
@@ -282,7 +281,7 @@ def Create_WP_Y_CSV(csv_fh, output_dir, croptype):
 
         lengths_within_year = np.array([min(year_length, abs((boundary - end).days)) - abs(min(0, (boundary - start).days)) for start, end in zip(starts, ends)])
 
-        fractions = old_div(lengths_within_year, lengths_total_season)
+        fractions = lengths_within_year / lengths_total_season
 
         y = np.sum(np.array([Y[start_dates == start][0] for start in starts]) * fractions)
         yirr = np.sum(np.array([Yirr[start_dates == start][0] for start in starts]) * fractions)

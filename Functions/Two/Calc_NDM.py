@@ -10,7 +10,6 @@ from __future__ import print_function
 from __future__ import division
 # import general python modules
 from builtins import range
-from past.utils import old_div
 import os
 import gdal
 import numpy as np
@@ -109,12 +108,12 @@ def NPP_GPP_Based(Dir_Basin, Data_Path_GPP, Data_Path_NPP, Startdate, Enddate):
 
             # Remove nan values
             Data[Data == NDV] = np.nan
-
+            Data[np.isnan(Data)] = 0
             # Add data to yearly sum
             Yearly_GPP += Data
 
         # Check if size is the same of NPP and GPP otherwise resize
-        if not (size_X_NPP is size_X or size_Y_NPP is size_Y):
+        if not (size_X_NPP == size_X and size_Y_NPP == size_Y):
             Yearly_NPP = RC.resize_array_example(Yearly_NPP, Yearly_GPP)
 
         # Loop over the monthly dates
@@ -135,7 +134,7 @@ def NPP_GPP_Based(Dir_Basin, Data_Path_GPP, Data_Path_NPP, Startdate, Enddate):
                 monthly_GPP[monthly_GPP == NDV] = np.nan
 
                 # Calculate the NDM based on the monthly and yearly NPP and GPP (fraction of GPP)
-                Monthly_NDM = old_div(Yearly_NPP * monthly_GPP, Yearly_GPP * (30./12.) *10000) # kg/ha
+                Monthly_NDM = Yearly_NPP * monthly_GPP/Yearly_GPP * (30./12.) *10000 # kg/ha
 
                 # Define output name
                 output_name = os.path.join(Data_Path_NDM, 'NDM_MOD17_kg_ha-1_monthly_%d.%02d.01.tif' %(int(year), int(month)))

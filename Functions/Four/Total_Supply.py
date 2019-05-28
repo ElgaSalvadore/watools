@@ -8,7 +8,6 @@ Module: Function/Four
 """
 from __future__ import division
 
-from past.utils import old_div
 def Fraction_Based(nc_outname, Startdate, Enddate):
     """
     This functions calculated monthly total supply based ETblue and fractions that are given in the get dictionary script
@@ -57,7 +56,7 @@ def Fraction_Based(nc_outname, Startdate, Enddate):
             DataCube_Consumed_Fractions[DataCube_LU == Value_LULC] = consumed_fractions_dict[Classes_LULC]
 
     # Calculated Total Supply
-    DataCube_Tot_Sup = old_div(DataCube_ETblue[:,:,:],DataCube_Consumed_Fractions[None,:,:])
+    DataCube_Tot_Sup = DataCube_ETblue[:,:,:] / DataCube_Consumed_Fractions[None,:,:]
 
     # Calculated Non consumed
     DataCube_Non_Consumed = DataCube_Tot_Sup - DataCube_ETblue

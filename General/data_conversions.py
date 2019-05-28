@@ -6,7 +6,6 @@ Created on Sun Dec 18 13:07:32 2016
 """
 from __future__ import division
 from builtins import range
-from past.utils import old_div
 import gzip
 import zipfile
 import tarfile
@@ -372,9 +371,9 @@ def Save_as_NC(namenc, DataCube, Var, Reference_filename,  Startdate = '', Endda
         # Set the data variable
         if Startdate is not '':
             for i in range(len(Dates)):
-                preco[i,:,:] = old_div(DataCube[i,:,:]*1.,np.float(Scaling_factor))
+                preco[i,:,:] = DataCube[i,:,:] / np.float(Scaling_factor)
         else:
-            preco[:,:] = old_div(DataCube[:,:] * 1.,np.float(Scaling_factor))
+            preco[:,:] = DataCube[:,:] / np.float(Scaling_factor)
 
         nco.close()
     return()
@@ -478,7 +477,7 @@ def Add_NC_Array_Variable(nc_outname, Array, name, unit, Scaling_factor = 1):
 
     # create input array
     Array[np.isnan(Array)] = -9999 * np.float(Scaling_factor)
-    Array = np.int_(old_div(Array * 1.,np.float(Scaling_factor)))
+    Array = np.int_(Array /np.float(Scaling_factor))
 
     # Create NetCDF file
     nco = netCDF4.Dataset(nc_outname, 'r+', format = 'NETCDF4_CLASSIC')
@@ -508,7 +507,7 @@ def Add_NC_Array_Static(nc_outname, Array, name, unit, Scaling_factor = 1):
 
     # create input array
     Array[np.isnan(Array)] = -9999 * np.float(Scaling_factor)
-    Array = np.int_(old_div(Array * 1.,np.float(Scaling_factor)))
+    Array = np.int_(Array /np.float(Scaling_factor))
 
     # Create NetCDF file
     nco = netCDF4.Dataset(nc_outname, 'r+', format = 'NETCDF4_CLASSIC')

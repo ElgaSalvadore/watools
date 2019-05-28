@@ -8,7 +8,6 @@ Module: Function/Start
 """
 from __future__ import division
 # General Python modules
-from past.utils import old_div
 import numpy as np
 import os
 import glob
@@ -145,7 +144,7 @@ def Nearest_Interpolate(Dir_in, Startdate, Enddate, Dir_out = None):
         i += 1
 
         # Calculate the average
-        Data_one_month[Weight_tot != 0.] = old_div(Monthly[Weight_tot != 0.], Weight_tot[Weight_tot != 0.])
+        Data_one_month[Weight_tot != 0.] = Monthly[Weight_tot != 0.] / Weight_tot[Weight_tot != 0.]
 
         # Define output directory
         if Dir_out == None:

@@ -10,7 +10,6 @@ from __future__ import division
 
 # import general python modules
 from builtins import range
-from past.utils import old_div
 import pandas as pd
 import numpy as np
 import datetime
@@ -126,13 +125,13 @@ def ITE(Dir_Basin, nc_outname, Startdate, Enddate, Simulation):
     NDM[NDM == -9999] = 0.    
 
     # Calculate I
-    I = LAI * (1 - np.power(1 + (old_div(P,RD)) * (1 - np.exp(-0.5 * LAI)) * (old_div(1,LAI)),-1)) * RD
+    I = LAI * (1 - np.power(1 + (P/RD) * (1 - np.exp(-0.5 * LAI)) * (1/LAI),-1)) * RD
 
     # Set boundary
     I[np.isnan(LAI)] = np.nan
 
     # Calculate T
-    T = np.minimum((old_div(NDM,NDMmax_months)),np.ones(np.shape(NDM))) * 0.95 * (ET - I)
+    T = np.minimum((NDM/NDMmax_months),np.ones(np.shape(NDM))) * 0.95 * (ET - I)
 
     # Mask Data
     ET = ET * mask3d

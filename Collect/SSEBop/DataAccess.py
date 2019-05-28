@@ -29,7 +29,6 @@ from __future__ import division
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
-from past.utils import old_div
 import numpy as np
 import os
 import pandas as pd
@@ -171,7 +170,7 @@ def DownloadData(Dir, Startdate, Enddate, latlim, lonlim, Waitbar, version, Prod
                         
                 if Product == "ETpot":
                     Array_ETpot = RC.Open_bil_array(local_filename)
-                    Array_ETpot = old_div(Array_ETpot,100)
+                    Array_ETpot = Array_ETpot / 100
                     Geo_out = tuple([-180.5, 1, 0, 90.5, 0, -1])
                     dest = DC.Save_as_MEM(Array_ETpot, Geo_out, "WGS84")
                     data, Geo_out = RC.clip_data(dest, latlim, lonlim)

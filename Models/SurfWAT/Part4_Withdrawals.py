@@ -5,7 +5,6 @@ Created on Mon Mar 12 15:27:12 2018
 @author: tih
 """
 from __future__ import division
-from past.utils import old_div
 import copy
 import numpy as np
 import sys
@@ -25,7 +24,7 @@ def Run(input_nc, output_nc):
     # Open Supply Array
     DataCube_surface_withdrawal_mm = RC.Open_nc_array(input_nc, Var = 'Extraction_M')
     Areas_in_m2 = RC.Open_nc_array(input_nc, Var = 'area')
-    DataCube_surface_withdrawal_m3 = ((old_div(DataCube_surface_withdrawal_mm,1000)) * Areas_in_m2[None,:,:])
+    DataCube_surface_withdrawal_m3 = ((DataCube_surface_withdrawal_mm/1000) * Areas_in_m2[None,:,:])
 
     # Open Basin Array
     Basin = RC.Open_nc_array(input_nc, Var = 'basin')
@@ -55,7 +54,7 @@ def Run(input_nc, output_nc):
     for i in np.unique(ID_Rivers_flow)[1:]:
         Count += 1
         if np.nansum(DataCube_surface_withdrawal_m3[:,ID_Rivers_flow == i]) > 0:
-            sys.stdout.write("\r%s Procent of adding irrigation completed with %.2f x 10^9 m3 Water Error       " %(np.int(np.ceil((old_div(np.float(Count),len(np.unique(ID_Rivers_flow))*100)))),old_div(Water_Error,1e9)))
+            sys.stdout.write("\r%s Procent of adding irrigation completed with %.2f x 10^9 m3 Water Error       " %(np.int(np.ceil((np.float(Count)/len(np.unique(ID_Rivers_flow))*100))),Water_Error/1e9))
             sys.stdout.flush()
             #print('%s Procent of adding irrigation completed' %np.int(i/np.unique(ID_Rivers_flow)[-1]*100))
             total_surface_withdrawal = np.nansum(DataCube_surface_withdrawal_m3[:,ID_Rivers_flow == i] ,1)
@@ -74,7 +73,7 @@ def Run(input_nc, output_nc):
                     
                     # Create Water error map
                     if np.nansum(total_surface_withdrawal[:,None].flatten() - Real_Surface_Withdrawal) > 0:
-                        Errors_in_mm = old_div((total_surface_withdrawal[:,None].flatten() - Real_Surface_Withdrawal),(np.nansum(Areas_in_m2[ID_Rivers_flow == i])))
+                        Errors_in_mm = (total_surface_withdrawal[:,None].flatten() - Real_Surface_Withdrawal)/(np.nansum(Areas_in_m2[ID_Rivers_flow == i]))
                         Area_Errors = np.zeros(DataCube_surface_withdrawal_m3.shape)
                         Area_Errors[:,ID_Rivers_flow == i] = 1
                         Area_Errors = Errors_in_mm[:,None,None] * Area_Errors

@@ -7,7 +7,6 @@ Created on Mon Mar 12 15:26:44 2018
 from __future__ import print_function
 from __future__ import division
 from builtins import range
-from past.utils import old_div
 def Run(input_nc, output_nc, input_JRC):
 
     # Define names
@@ -87,8 +86,8 @@ def Calc_Regions(input_nc, output_nc, input_JRC, Boundaries):
     del basin_array
 
     # sum larger areas to find lakes
-    x_size=np.round(old_div(int(np.shape(Array_JRC_occ)[0]),30))
-    y_size=np.round(old_div(int(np.shape(Array_JRC_occ)[1]),30))
+    x_size=np.round(int(np.shape(Array_JRC_occ)[0])/30)
+    y_size=np.round(int(np.shape(Array_JRC_occ)[1])/30)
     sum_array = np.zeros([x_size, y_size])
 
     for i in range(0,len(sum_array)):
@@ -328,9 +327,9 @@ def Find_Area_Volume_Relation(region, input_JRC, input_nc):
             plt.plot(t, popt[0]*(t-popt[2])**popt[1] + popt[3], 'g--')
             plt.axis([0, np.max(Reservoir_characteristics[mini:maxi_end,2]), 0, np.max(Reservoir_characteristics[mini:maxi_end,3])])
             plt.show()
-            Volume_error = old_div(popt[3],V0 * 100) - 100
+            Volume_error = popt[3]/ V0 * 100 - 100
             print('error Volume = %s percent' %Volume_error)
-            print('error Area = %s percent' %(old_div(A0,popt[2] * 100) - 100))
+            print('error Area = %s percent' %(A0/popt[2] * 100 - 100))
 
             if Volume_error < 30 and Volume_error > -30:
                 done = 1
@@ -454,7 +453,7 @@ def Calc_Diff_Storage(Area_Reservoir_Values, popt):
                         p = i
 
 
-            Water_area_m2[i,2] = old_div((Water_area_m2[p,2] + Water_area_m2[i-1,2]),(2))
+            Water_area_m2[i,2] = (Water_area_m2[p,2] + Water_area_m2[i-1,2])/(2)
 
 
     # Get the Q-A relation
@@ -549,7 +548,7 @@ def Add_Reservoirs(output_nc, Diff_Water_Volume, Regions):
 
             Difference = Change_outflow_m3 - Change_Reservoir_m3
             if abs(np.sum(Difference))>10000 and np.sum(Change_Reservoir_m3[Change_outflow_m3>0])>0:
-                Change_outflow_m3[Change_outflow_m3<0] = old_div(Change_outflow_m3[Change_outflow_m3<0]*np.sum(Change_outflow_m3[Change_outflow_m3>0]),np.sum(Change_Reservoir_m3[Change_outflow_m3>0]))
+                Change_outflow_m3[Change_outflow_m3<0] = Change_outflow_m3[Change_outflow_m3<0]*np.sum(Change_outflow_m3[Change_outflow_m3>0])/np.sum(Change_Reservoir_m3[Change_outflow_m3>0])
 
             # Find key name (which is also the lenght of the river dictionary)
             i = len(River_dict)

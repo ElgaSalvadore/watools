@@ -357,16 +357,25 @@ def get_bluegreen_classes(version = '1.0'):
     'other':                [68,69,70,71,72,76,78,73,67,65,66,64,79,80,6, 7, 18, 21, 22, 26, 27, 28, 29, 32, 45, 46, 47, 48, 49, 50, 51, 5, 25, 30, 31],
     }
 
+#    mvg_avg_len['1.0'] = {
+#    'crops':                2,
+#    'perennial crops':      3,
+#    'savanna':              4,
+#    'water':                1,
+#    'forests':              5,
+#    'grass':                1,
+#    'other':                1,
+#    }
+    
     mvg_avg_len['1.0'] = {
-    'crops':                2,
-    'perennial crops':      3,
-    'savanna':              4,
+    'crops':                1,
+    'perennial crops':      1,
+    'savanna':              1,
     'water':                1,
-    'forests':              5,
+    'forests':              1,
     'grass':                1,
     'other':                1,
     }
-
     return gb_cats[version], mvg_avg_len[version]
 
 #import csv

@@ -14,7 +14,6 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import str
 from builtins import range
-from past.utils import old_div
 import os
 import numpy as np
 import pandas as pd
@@ -170,8 +169,8 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, hdf_library):
     # Make a new tile for the data
     # NPP_SIZE = 2
     NPP_SIZE = 4
-    sizeX = int(old_div((TilesHorizontal[1] - TilesHorizontal[0] + 1) * 4800, NPP_SIZE) )
-    sizeY = int(old_div((TilesVertical[1] - TilesVertical[0] + 1) * 4800, NPP_SIZE))
+    sizeX = int((TilesHorizontal[1] - TilesHorizontal[0] + 1) * 4800 / NPP_SIZE)
+    sizeY = int((TilesVertical[1] - TilesVertical[0] + 1) * 4800 / NPP_SIZE)
     DataTot = np.zeros((sizeY, sizeX))
 
     # Load accounts
@@ -296,21 +295,21 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, hdf_library):
 
                     data = sds[idx].ReadAsArray()
                     countYdata = (TilesVertical[1] - TilesVertical[0] + 2) - countY
-                    DataTot[int(old_div((countYdata - 1) * 4800, NPP_SIZE)):int(old_div(countYdata * 4800, NPP_SIZE)), int(old_div((countX - 1) * 4800, NPP_SIZE)):int(old_div(countX * 4800, NPP_SIZE))]=data * 0.0001
+                    DataTot[int((countYdata - 1) * 4800/NPP_SIZE):int(countYdata * 4800/NPP_SIZE), int((countX - 1) * 4800/NPP_SIZE):int(countX * 4800/NPP_SIZE)]=data * 0.0001
                 del data
 
             # if the tile not exists or cannot be opened, create a nan array with the right projection
             except:
                 if Horizontal==TilesHorizontal[0] and Vertical==TilesVertical[0]:
-                     x1 = old_div((TilesHorizontal[0] - 19) * 4800, NPP_SIZE * Distance)
-                     x4 = old_div((TilesVertical[0] - 9) * 4800, NPP_SIZE * -1 * Distance)
+                     x1 = (TilesHorizontal[0] - 19) * 4800 / NPP_SIZE * Distance
+                     x4 = (TilesVertical[0] - 9) * 4800 / NPP_SIZE * -1 * Distance
                      geo = 	[x1, Distance, 0.0, x4, 0.0, -Distance]
                      geo_t=tuple(geo)
 
                 proj='PROJCS["unnamed",GEOGCS["Unknown datum based upon the custom spheroid",DATUM["Not specified (based on custom spheroid)",SPHEROID["Custom spheroid",6371007.181,0]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]],PROJECTION["Sinusoidal"],PARAMETER["longitude_of_center",0],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["Meter",1]]'
-                data=np.ones((int(old_div(4800, NPP_SIZE)), int(old_div(4800, NPP_SIZE)))) * (0)
+                data=np.ones((int(4800/ NPP_SIZE), int(4800/ NPP_SIZE))) * (0)
                 countYdata=(TilesVertical[1] - TilesVertical[0] + 2) - countY
-                DataTot[int(old_div((countYdata - 1) * 4800, NPP_SIZE)):int(old_div(countYdata * 4800, NPP_SIZE)),int(old_div((countX - 1) * 4800, NPP_SIZE)):int(old_div(countX * 4800, NPP_SIZE))] = data * 0.0001
+                DataTot[int((countYdata - 1) * 4800/ NPP_SIZE):int(countYdata * 4800/NPP_SIZE),int((countX - 1) * 4800/ NPP_SIZE):int(countX * 4800/ NPP_SIZE)] = data * 0.0001
 
     # Make geotiff file
     DataTot[DataTot>3.27]=-9999
@@ -321,8 +320,8 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, hdf_library):
          dst_ds.SetProjection(proj)
     except:
         proj='PROJCS["unnamed",GEOGCS["Unknown datum based upon the custom spheroid",DATUM["Not specified (based on custom spheroid)",SPHEROID["Custom spheroid",6371007.181,0]],PRIMEM["Greenwich",0],UNIT["degree",0.0174532925199433]],PROJECTION["Sinusoidal"],PARAMETER["longitude_of_center",0],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["Meter",1]]'
-        x1 = old_div((TilesHorizontal[0] - 18) * 4800, NPP_SIZE * Distance)
-        x4 = old_div((TilesVertical[0] - 9) * 4800, NPP_SIZE * -1 * Distance)
+        x1 = (TilesHorizontal[0] - 18) * 4800/ NPP_SIZE * Distance
+        x4 = (TilesVertical[0] - 9) * 4800/ NPP_SIZE * -1 * Distance
         geo = [x1, Distance, 0.0, x4, 0.0, -Distance]
         geo_t = tuple(geo)
         dst_ds.SetProjection(proj)

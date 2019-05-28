@@ -1,0 +1,7 @@
+conda install -c conda-forge gdal
+conda install netCDF4
+conda install joblib
+pip install pyproj
+conda install paramiko
+conda install pyshp
+conda install -c conda-forge cairosvg

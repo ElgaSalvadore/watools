@@ -11,7 +11,6 @@ from __future__ import division
 # import general modules
 from builtins import str
 from builtins import range
-from past.utils import old_div
 import os
 import pandas as pd
 import numpy as np
@@ -118,9 +117,9 @@ def Create(Dir_Basin, Simulation, Basin, Startdate, Enddate, nc_outname, Example
     sheet2_classes_dict = GD.get_sheet2_classes()
 
     # Convert data from mm/month to km3/month
-    I_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_I), 1e12)
-    E_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_E), 1e12)
-    T_km3 = old_div(np.einsum('ij,kij->kij', area_in_m2, DataCube_T), 1e12)
+    I_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_I)/ 1e12
+    E_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_E)/ 1e12
+    T_km3 = np.einsum('ij,kij->kij', area_in_m2, DataCube_T)/ 1e12
 
     # Calculate beneficial I, E, and T
     Iben_km3 = np.einsum('ij,kij->kij', I_ben_array, I_km3)

@@ -23,7 +23,6 @@ from __future__ import division
 # General modules
 from builtins import str
 from builtins import range
-from past.utils import old_div
 import numpy as np
 import os
 import pandas as pd
@@ -74,14 +73,14 @@ def DownloadData(Dir, Startdate, Enddate, latlim, lonlim, Waitbar, type_PROBAV, 
         type_time = "10-daily"
         Startdate_pandas = pd.Timestamp(Startdate)
         Day = Startdate_pandas.day
-        Day_offset = int(np.ceil(((Day -1) / 10. - int(old_div(int(Day - 1), 5))) * 10))  
+        Day_offset = int(np.ceil(((Day -1) / 10. - int(int(Day - 1)/ 5)) * 10))  
         Startdate = Startdate_pandas - pd.offsets.Day(Day_offset)
         list_days = [1,11,21]
     elif type_PROBAV.split('_')[-1] == "S5":
         type_time = "5-daily"
         Startdate_pandas = pd.Timestamp(Startdate)
         Day = Startdate_pandas.day
-        Day_offset = int(np.ceil(((Day -1) / 5. - int(old_div(int(Day - 1), 5))) * 5)) 
+        Day_offset = int(np.ceil(((Day -1) / 5. - int(int(Day - 1)/ 5)) * 5)) 
         Startdate = Startdate_pandas - pd.offsets.Day(Day_offset)
         list_days = [1,6,11,16,21,26]
     elif type_PROBAV.split('_')[-1] == "S1":

@@ -9,7 +9,6 @@ Module: Function/Start
 from __future__ import division
 # import general python modules
 from builtins import str
-from past.utils import old_div
 import numpy as np
 import os
 
@@ -86,20 +85,20 @@ def Calc_dlat_dlon(geo_out, size_X, size_Y):
     R_earth = 6371000
 
     # Calculate the lat and lon in radians
-    lonRad = old_div(dlon_2d * np.pi,180)
-    latRad = old_div(dlat_2d * np.pi,180)
+    lonRad = dlon_2d * np.pi / 180
+    latRad = dlat_2d * np.pi / 180
 
     # Calculate the difference in lat and lon
     lonRad_dif = abs(lonRad[:,1:] - lonRad[:,:-1])
     latRad_dif = abs(latRad[:-1] - latRad[1:])
 
     # Calculate the distance between the upper and lower pixel edge
-    a = np.sin(old_div(latRad_dif[:,:-1],2)) * np.sin(old_div(latRad_dif[:,:-1],2))
+    a = np.sin(latRad_dif[:,:-1]/2) * np.sin(latRad_dif[:,:-1]/2)
     clat = 2 * np.arctan2(np.sqrt(a), np.sqrt(1-a));
     dlat = R_earth * clat
 
     # Calculate the distance between the eastern and western pixel edge
-    b = np.cos(latRad[1:,:-1]) * np.cos(latRad[:-1,:-1]) * np.sin(old_div(lonRad_dif[:-1,:],2)) * np.sin(old_div(lonRad_dif[:-1,:],2))
+    b = np.cos(latRad[1:,:-1]) * np.cos(latRad[:-1,:-1]) * np.sin(lonRad_dif[:-1,:]/2) * np.sin(lonRad_dif[:-1,:]/2)
     clon = 2 * np.arctan2(np.sqrt(b), np.sqrt(1-b));
     dlon = R_earth * clon
 

@@ -4,7 +4,6 @@
 from __future__ import print_function
 from __future__ import division
 from builtins import object
-from past.utils import old_div
 import numpy as np
 import calendar
 import os
@@ -141,7 +140,7 @@ def DownloadData(Dir, Var, Startdate, Enddate, latlim, lonlim, Waitbar, cores,
         start = datetime.datetime(year=1900, month=1, day=1)
         end = datetime.datetime(year, month, day)
         diff = end - start
-        hours_from_start_begin = old_div(diff.total_seconds(),60/60)
+        hours_from_start_begin = diff.total_seconds()/60/60
 
         Date_good = np.zeros(len(Data_time))
         if TimeCase == 'daily':

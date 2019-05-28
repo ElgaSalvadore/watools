@@ -9,7 +9,6 @@ Module: Products/ETref
 '''
 from __future__ import division
 # import general python modules
-from past.utils import old_div
 import numpy as np
 
 def SlopeInfluence(DEMmap,latitude,longitude,day):
@@ -51,40 +50,40 @@ def SlopeInfluence(DEMmap,latitude,longitude,day):
            
     # Calculate dlat/dlon assuming a regular grid
     latdiff = np.diff(lat,axis=0) 
-    dlat = np.vstack((latdiff[0,:][None,:],old_div((latdiff[1:,:] + latdiff[0:-1,:]),2),latdiff[-1,:][None,:]))
+    dlat = np.vstack((latdiff[0,:][None,:],(latdiff[1:,:] + latdiff[0:-1,:])/2,latdiff[-1,:][None,:]))
     londiff = np.diff(lon,axis=1) 
-    dlon = np.hstack((londiff[:,0][:,None],old_div((londiff[:,1:] + londiff[:,0:-1]),2),londiff[:,-1][:,None]))
+    dlon = np.hstack((londiff[:,0][:,None],(londiff[:,1:] + londiff[:,0:-1])/2,londiff[:,-1][:,None]))
     
     # And convert to meters
-    lons = np.cos(lat) * np.cos(lat) * np.sin(old_div(dlon,2)) ** 2
-    lats = np.sin(old_div(dlat, 2)) ** 2
+    lons = np.cos(lat) * np.cos(lat) * np.sin(dlon/2) ** 2
+    lats = np.sin(dlat/ 2) ** 2
     dlon = 2 * np.arcsin(np.sqrt(lons)) * 6371000
     dlat = 2 * np.arcsin(np.sqrt(lats)) * 6371000
     del lats, lons
     
     # Calculate dy_lat and dy_lon, height differences in latitude and longitude directions.
     latdiff = np.diff(DEMmap,axis=0) 
-    dy_lat = np.vstack((latdiff[0,:][None,:],old_div((latdiff[1:,:] + latdiff[0:-1,:]),2),latdiff[-1,:][None,:]))
+    dy_lat = np.vstack((latdiff[0,:][None,:],(latdiff[1:,:] + latdiff[0:-1,:])/2,latdiff[-1,:][None,:]))
     londiff = -np.diff(DEMmap,axis=1) 
-    dy_lon = np.hstack((londiff[:,0][:,None],old_div((londiff[:,1:] + londiff[:,0:-1]),2),londiff[:,-1][:,None]))    
+    dy_lon = np.hstack((londiff[:,0][:,None],(londiff[:,1:] + londiff[:,0:-1])/2,londiff[:,-1][:,None]))    
     
     # Calculate slope
-    slope = np.arctan(old_div((np.abs(dy_lat) + np.abs(dy_lon)), np.sqrt(dlon**2+dlat**2)))
+    slope = np.arctan((np.abs(dy_lat) + np.abs(dy_lon))/ np.sqrt(dlon**2+dlat**2))
     
     # declination of earth
-    delta = np.arcsin(np.sin(23.45/360*2*np.pi)*np.sin(old_div((360.0/365.0)*(day-81),360*2*np.pi)))
+    delta = np.arcsin(np.sin(23.45/360*2*np.pi)*np.sin((360.0/365.0)*(day-81)/360*2*np.pi))
     # EQ 2
-    D2 = old_div(1, (1 + 0.033* np.cos(old_div(day,365*2*np.pi))))
+    D2 = 1/ (1 + 0.033* np.cos(day/365*2*np.pi))
     
-    constant =  old_div(G, D2 / (2*np.pi)) 
+    constant =  G / D2 / (2*np.pi)
     
     # Slope direction
     with np.errstate(divide='ignore'):
-        slopedir = np.arctan(old_div(dy_lon,dy_lat)) 
+        slopedir = np.arctan(dy_lon/dy_lat) 
         
         # Exception if divided by zero    
-        slopedir[np.logical_and(dy_lat == 0 , dy_lon <= 0)] = old_div(np.pi, 2)
-        slopedir[np.logical_and(dy_lat == 0, dy_lon > 0)] = old_div(-np.pi, 2)
+        slopedir[np.logical_and(dy_lat == 0 , dy_lon <= 0)] = np.pi/ 2
+        slopedir[np.logical_and(dy_lat == 0, dy_lon > 0)] = -np.pi/ 2
         
         # Correction ip dy_lat > 0
         slopedir[np.logical_and(dy_lat > 0, dy_lon < 0)] = np.pi + slopedir[np.logical_and(dy_lat > 0, dy_lon < 0)]
@@ -112,22 +111,22 @@ def SlopeInfluence(DEMmap,latitude,longitude,day):
     #######
     
     # Check where there is no sunrise and assign values
-    Horizontal[np.abs(delta-lat) > old_div(np.pi,2)] = 0 
+    Horizontal[np.abs(delta-lat) > (np.pi/2)] = 0 
     
     # Check whether there are areas without sunset
-    ID = np.where(np.ravel(np.abs(delta+lat)) > old_div(np.pi,2))    
+    ID = np.where(np.ravel(np.abs(delta+lat)) > (np.pi/2))    
     sunrise = -np.pi
     sunset = np.pi
-    Horizontal.flat[ID] = IntegrateHorizontal((old_div(G,(np.pi*D2))),sunrise,sunset,delta,lat.flat[ID])    
+    Horizontal.flat[ID] = IntegrateHorizontal((G/(np.pi*D2)),sunrise,sunset,delta,lat.flat[ID])    
 
     # Calculate sunset and sunrise for all other cells    
     ID = np.where(np.isnan(np.ravel(Horizontal)))    
     bound = BoundsHorizontal(delta,lat.flat[ID])     
-    Horizontal.flat[ID] = IntegrateHorizontal((old_div(G,(np.pi*D2))),-bound,bound,delta,lat.flat[ID])
+    Horizontal.flat[ID] = IntegrateHorizontal((G/(np.pi*D2)),-bound,bound,delta,lat.flat[ID])
     
     ws = np.arccos(-np.tan(delta)*np.tan(lat))
     a,b,c,g,h = Table2(delta,lat,slope,slopedir) 
-    sinb_hor = old_div((2*g**2*ws + 4*g*h*np.sin(ws) + h**2*(ws+0.5*np.sin(2*ws))), (2*(g*ws+h*np.sin(ws))))    
+    sinb_hor = (2*g**2*ws + 4*g*h*np.sin(ws) + h**2*(ws+0.5*np.sin(2*ws)))/ (2*(g*ws+h*np.sin(ws)))    
     
     #######
     ## Sloping (EQ )
@@ -145,7 +144,7 @@ def SlopeInfluence(DEMmap,latitude,longitude,day):
     Sloping.flat[ID] = OnePeriodSun(constant,delta,slope.flat[ID],slopedir.flat[ID],lat.flat[ID])
     f1.flat[ID],f2.flat[ID],f3.flat[ID],f4.flat[ID],f5.flat[ID] = Table1a(A1.flat[ID],A2.flat[ID])  
 
-    sinb = old_div((b*g-a*h*f1 - c*g*f2 + (0.5*b*h - a*g)*f3 + 0.25*b*h*f4 + 0.5*c*h*f5), b*f1) - c*f2 - a*f3
+    sinb = (b*g-a*h*f1 - c*g*f2 + (0.5*b*h - a*g)*f3 + 0.25*b*h*f4 + 0.5*c*h*f5)/ b*f1 - c*f2 - a*f3
     #sinb[sinb[~np.isnan(sinb)] < 0.0] = 0.0
     
     fi = 0.75 + 0.25*np.cos(slope) - (0.5*slope/np.pi)
@@ -333,8 +332,8 @@ def BoundsSlope(a,b,c):
     #Equation 13
     Div = (b**2+c**2)   
     Div[Div <= 0] = 0.00001
-    sinB = old_div((a*c + b*np.sqrt(b**2+c**2-a**2)), Div)
-    sinA = old_div((a*c - b*np.sqrt(b**2+c**2-a**2)), Div)
+    sinB = (a*c + b*np.sqrt(b**2+c**2-a**2))/ Div
+    sinA = (a*c - b*np.sqrt(b**2+c**2-a**2))/ Div
     
     sinB[sinB < -1] = -1; sinB[sinB > 1] = 1
     sinA[sinA < -1] = -1; sinA[sinA > 1] = 1
@@ -353,8 +352,8 @@ def BoundsHorizontal(delta,lat):
     # If there is no sunset or sunrise hours the values are either set to 0 (polar night)
     # or pi (polar day)    
     bound = np.arccos(-np.tan(delta)*np.tan(lat))
-    bound[abs(delta+lat) > old_div(np.pi,2)] = np.pi
-    bound[abs(delta-lat) > old_div(np.pi,2)] = 0
+    bound[abs(delta+lat) > (np.pi/2)] = np.pi
+    bound[abs(delta-lat) > (np.pi/2)] = 0
     
     return(bound)
 

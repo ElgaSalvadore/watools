@@ -13,7 +13,6 @@ from __future__ import division
 from future import standard_library
 standard_library.install_aliases()
 from builtins import range
-from past.utils import old_div
 import os
 import numpy as np
 import shutil
@@ -118,9 +117,9 @@ def RetrieveData(args):
             latmerge = [lat_min_merge, lat_max_merge]
             data_one, geo_one = RC.clip_data(data_in, latmerge, lonmerge)
 
-            Ystart = int(old_div((geo_one[3] - latlim[1]),geo_one[5]))
+            Ystart = int((geo_one[3] - latlim[1])/geo_one[5])
             Yend = int(Ystart + np.shape(data_one)[0])
-            Xstart = int(old_div((geo_one[0] - lonlim[0]),geo_one[1]))
+            Xstart = int((geo_one[0] - lonlim[0])/geo_one[1])
             Xend = int(Xstart + np.shape(data_one)[1])
 
             data_end[Ystart:Yend, Xstart:Xend] = data_one

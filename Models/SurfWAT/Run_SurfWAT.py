@@ -8,7 +8,6 @@ from __future__ import division
 
 from builtins import str
 from builtins import range
-from past.utils import old_div
 def main(input_nc, output_nc, input_JRC, Inflow_Text_Files, include_reservoirs = 1):
 
     import time
@@ -38,7 +37,7 @@ def main(input_nc, output_nc, input_JRC, Inflow_Text_Files, include_reservoirs =
     # Extract basin data from NetCDF file
     Basin = RC.Open_nc_array(input_nc, Var = 'basin')
     Areas_in_m2 = RC.Open_nc_array(input_nc, Var = 'area')
-    Runoff_in_m3_month = ((old_div(Runoff,1000)) * Areas_in_m2)
+    Runoff_in_m3_month = ((Runoff/1000) * Areas_in_m2)
 
     ###############################################################################
     ############################### Run Part 1 ####################################

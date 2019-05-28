@@ -11,7 +11,6 @@ from __future__ import division
 # General modules
 from builtins import str
 from builtins import range
-from past.utils import old_div
 import pandas as pd
 import os
 import gdal
@@ -198,7 +197,7 @@ def RetrieveData(Date, args):
             Datatot = Datatot + data
 
         # Calculate the average in W/m^2 over the day
-        DatatotDay = old_div(Datatot, 4)
+        DatatotDay = Datatot/4
         DatatotDayEnd = np.zeros([int(Datatot.shape[0]), int(Datatot.shape[1])])
         DatatotDayEnd[:,0:int(Datatot.shape[0])] = DatatotDay[:, int(Datatot.shape[0]):int(Datatot.shape[1])]
         DatatotDayEnd[:,int(Datatot.shape[0]):int(Datatot.shape[1])] = DatatotDay[:, 0:int(Datatot.shape[0])]
