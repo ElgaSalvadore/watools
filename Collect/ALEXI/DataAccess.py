@@ -186,6 +186,9 @@ def ALEXI_weekly(Date, Enddate, output_folder, latlim, lonlim, Year, Waitbar, to
             amount += 1
             WaitbarConsole.printWaitBar(amount, total_amount, prefix = 'Progress:', suffix = 'Complete', length = 50)
 
+        # Delete original file
+        os.remove(local_filename)
+
         # Check if this file must be downloaded
         Date = pd.Timestamp(Date)
         if Date.toordinal() > Stop:
