@@ -62,7 +62,7 @@ def DownloadData(Dir, Startdate, Enddate, latlim, lonlim, Waitbar, cores, hdf_li
 
     # Make an array of the days of which the FPAR is taken
     Dates = Make_TimeStamps(Startdate,Enddate)
-
+#    Dates = pd.date_range(Startdate,Enddate,freq = 'M')
     # Create Waitbar
     if Waitbar == 1:
         import watools.Functions.Start.WaitbarConsole as WaitbarConsole
@@ -144,6 +144,7 @@ def RetrieveData(Date, args):
     data, geo = RC.clip_data(name_reprojected, latlim, lonlim)
 
     # Save the file as tiff
+    
     FPARfileName = os.path.join(output_folder, 'SnowFrac_MOD10_unitless_8-daily_'  + Date.strftime('%Y') + '.' + Date.strftime('%m') + '.' + Date.strftime('%d') + '.tif')
     DC.Save_as_tiff(name=FPARfileName, data=data, geo=geo, projection='WGS84')
 
@@ -230,6 +231,7 @@ def Collect_data(TilesHorizontal,TilesVertical,Date,output_folder, hdf_library):
     username, password = WebAccounts.Accounts(Type = 'NASA')
 
     # Download the MODIS FPAR data
+#    url = 'https://n5eil01u.ecs.nsidc.org/MOST/MOD10CM.006/' + Date.strftime('%Y') + '.' + Date.strftime('%m') + '/'
     url = 'https://n5eil01u.ecs.nsidc.org/MOST/MOD10A2.006/' + Date.strftime('%Y') + '.' + Date.strftime('%m') + '.' + Date.strftime('%d') + '/'
 
     dataset = requests.get(url, allow_redirects=False,stream = True)
