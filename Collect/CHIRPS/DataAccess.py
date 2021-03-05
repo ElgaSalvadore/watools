@@ -111,7 +111,8 @@ def RetrieveData(Date, args):
     [output_folder, TimeCase, xID, yID, lonlim, latlim] = args
 
     # open ftp server
-    ftp = FTP("chg-ftpout.geog.ucsb.edu", "", "")
+#    ftp = FTP("chg-ftpout.geog.ucsb.edu", "", "")
+    ftp = FTP("data.chc.ucsb.edu","","")
     ftp.login()
 
 	# Define FTP path to directory
@@ -119,6 +120,7 @@ def RetrieveData(Date, args):
         pathFTP = 'pub/org/chg/products/CHIRPS-2.0/global_daily/tifs/p05/%s/' %Date.strftime('%Y')
     elif TimeCase == 'monthly':
         pathFTP = 'pub/org/chg/products/CHIRPS-2.0/global_monthly/tifs/'
+#        pathFTP = 'products/CHIRPS-2.0/global_monthly/tifs/'
     else:
         raise KeyError("The input time interval is not supported")
 

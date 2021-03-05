@@ -19,7 +19,7 @@ import watools.General.data_conversions as DC
 
 def DownloadData(Dir, Startdate, Enddate, latlim, lonlim, Waitbar, cores, TimeCase):
     """
-    This function downloads TRMM daily or monthly data
+    This function downloads GPM daily or monthly data
 
     Keyword arguments:
     Dir -- 'C:/file/to/path/'
@@ -96,7 +96,7 @@ def DownloadData(Dir, Startdate, Enddate, latlim, lonlim, Waitbar, cores, TimeCa
 
 def RetrieveData(Date, args):
     """
-    This function retrieves TRMM data for a given date from the
+    This function retrieves GPM data for a given date from the
     ftp://disc2.nascom.nasa.gov server.
 
     Keyword arguments:
@@ -123,7 +123,7 @@ def RetrieveData(Date, args):
         URL = 'https://gpm1.gesdisc.eosdis.nasa.gov/opendap/hyrax/GPM_L3/GPM_3IMERGM.06/%d/3B-MO.MS.MRG.3IMERG.%d%02d01-S000000-E235959.%02d.V06B.HDF5.ascii?precipitation[0][%d:1:%d][%d:1:%d]'  %(year, year, month, month, xID[0], xID[1]-1, yID[0], yID[1]-1)
         Scaling = calendar.monthrange(year,month)[1] * 24
         DirFile = os.path.join(output_folder, "P_GPM.IMERG.V6_mm-month-1_monthly_%d.%02d.01.tif" %(year, month))
-
+        
     if not os.path.isfile(DirFile):
         dataset = requests.get(URL, allow_redirects=False,stream = True)
         try:
@@ -132,7 +132,7 @@ def RetrieveData(Date, args):
             from requests.packages.urllib3.exceptions import InsecureRequestWarning
             requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
             get_dataset  = requests.get(dataset.headers['location'], auth = (username, password), verify = False)
-
+        get_dataset.raise_for_status()
         # download data (first save as text file)
         pathtext = os.path.join(output_folder,'temp.txt')
         z = open(pathtext,'wb')
